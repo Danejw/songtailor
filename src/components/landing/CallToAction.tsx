@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Zap, Sparkles } from "lucide-react";
+import { Zap, Sparkles, Star } from "lucide-react";
 
 export const CallToAction = () => {
   const navigate = useNavigate();
@@ -13,6 +13,7 @@ export const CallToAction = () => {
       <div className="container mx-auto px-4 text-center relative">
         <div className="max-w-3xl mx-auto">
           <span className="inline-block px-4 py-1 rounded-full bg-white/10 text-white font-medium mb-6 backdrop-blur-sm">
+            <Star className="w-4 h-4 inline-block mr-2" />
             Ready to Start?
           </span>
           <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">

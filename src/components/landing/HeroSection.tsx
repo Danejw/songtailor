@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Check, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Sparkles, Star } from "lucide-react";
 
 export const HeroSection = () => {
   const navigate = useNavigate();
@@ -13,6 +13,7 @@ export const HeroSection = () => {
           <Sparkles className="w-6 h-6 text-purple-500 animate-pulse" />
         </div>
         <span className="inline-block px-6 py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-blue-500/10 text-purple-600 font-semibold mb-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 backdrop-blur-sm border border-purple-100">
+          <Star className="w-4 h-4 inline-block mr-2 text-yellow-500" />
           Transform Your Stories Into Songs
         </span>
         <h1 className="text-5xl md:text-7xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 leading-tight animate-gradient tracking-tight">
