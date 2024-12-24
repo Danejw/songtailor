@@ -24,7 +24,7 @@ const fetchOrdersWithDetails = async () => {
       .from('profiles')
       .select()
       .eq('id', session.user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       await supabase.from('profiles').insert({
@@ -39,7 +39,7 @@ const fetchOrdersWithDetails = async () => {
     .from('orders')
     .select(`
       *,
-      songs (
+      songs!fk_song (
         title,
         style,
         lyrics,
@@ -62,13 +62,17 @@ const fetchOrdersWithDetails = async () => {
     `)
     .order('created_at', { ascending: false });
 
-  if (ordersError) throw ordersError;
-
-  if (ordersData) {
-    return ordersData as Order[];
+  if (ordersError) {
+    console.error('Error fetching orders:', ordersError);
+    throw ordersError;
   }
 
-  return [];
+  if (!ordersData) {
+    return [];
+  }
+
+  // Type assertion to ensure the data matches our Order type
+  return ordersData as unknown as Order[];
 };
 
 export function RequestsTable() {
