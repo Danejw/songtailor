@@ -13,14 +13,14 @@ export const CallToAction = () => {
       <Sparkles className="absolute bottom-10 left-10 w-6 h-6 text-white/50 animate-pulse" />
       <div className="container mx-auto px-4 text-center relative">
         <div className="max-w-3xl mx-auto">
-          <span className="inline-block px-4 py-1 rounded-full bg-white/10 text-white font-medium mb-6 backdrop-blur-sm">
+          <span className="inline-block px-4 py-1 rounded-full bg-white/10 text-black font-medium mb-6 backdrop-blur-sm">
             <Star className="w-4 h-4 inline-block mr-2" />
             Ready to Start?
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-white">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-black">
             Ready to Create Your Perfect Song?
           </h2>
-          <p className="text-xl mb-12 opacity-90 text-white">
+          <p className="text-xl mb-12 opacity-90 text-black">
             Join thousands of happy customers who have turned their stories into beautiful songs
           </p>
           <Button 
