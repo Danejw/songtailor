@@ -6,7 +6,7 @@ export const CallToAction = () => {
   const navigate = useNavigate();
   
   return (
-    <section className="py-24 bg-gradient-to-br from-purple-600 via-purple-700 to-blue-700 text-white relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-br from-purple-600 via-purple-700 to-blue-700 text-white relative overflow-hidden grid-pattern">
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.1)_0%,rgba(255,255,255,0)_100%)]" />
       <Sparkles className="absolute top-10 right-10 w-6 h-6 text-white/50 animate-pulse" />
       <Sparkles className="absolute bottom-10 left-10 w-6 h-6 text-white/50 animate-pulse" />
