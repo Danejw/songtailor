@@ -17,22 +17,12 @@ export const FeaturesSection = () => {
             We combine creativity with expertise to deliver songs that capture your unique story
           </p>
         </div>
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-1 gap-8">
           {[
-            {
-              icon: Music,
-              title: "Quality Guaranteed",
-              description: "Receive quality music that matches your vision and exceeds expectations"
-            },
             {
               icon: Heart,
               title: "Personalized Touch",
               description: "Every song is uniquely crafted to tell your story"
-            },
-            {
-              icon: Star,
-              title: "Professional Production",
-              description: "Studio-quality sound with expert musicians and producers"
             }
           ].map((feature, index) => (
             <div key={index} className="group p-8 rounded-2xl transition-all duration-300 hover:shadow-2xl border border-purple-100 bg-gradient-to-br from-white to-purple-50 hover:scale-105">
