@@ -93,7 +93,7 @@ export function SongPurchaseForm() {
             user_id: session.user.id,
             amount: totalAmount,
             includes_both_versions: data.wantSecondSong,
-            includes_cover_image: data.wantCoverImage,
+            includes_cover_image: data.wantCoverImage || data.wantSecondCoverImage,
             status: 'paid',
             payment_status: 'succeeded',
             metadata: {
@@ -105,6 +105,32 @@ export function SongPurchaseForm() {
         .single();
 
       if (orderError) throw orderError;
+
+      // Create primary order song entry
+      const { error: primarySongError } = await supabase
+        .from('order_songs')
+        .insert([
+          {
+            order_id: orderData.id,
+            is_primary: true
+          }
+        ]);
+
+      if (primarySongError) throw primarySongError;
+
+      // If second song is requested, create another order song entry
+      if (data.wantSecondSong) {
+        const { error: secondarySongError } = await supabase
+          .from('order_songs')
+          .insert([
+            {
+              order_id: orderData.id,
+              is_primary: false
+            }
+          ]);
+
+        if (secondarySongError) throw secondarySongError;
+      }
 
       toast({
         title: "Order placed successfully!",
