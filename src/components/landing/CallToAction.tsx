@@ -25,7 +25,7 @@ export const CallToAction = () => {
           </p>
           <Button 
             size="lg" 
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/order")}
             className="bg-white text-purple-600 hover:bg-gray-100 hover:scale-105 transform transition-all duration-300 text-lg px-8 py-6 shadow-xl hover:shadow-2xl group relative overflow-hidden"
           >
             <span className="relative z-10 flex items-center">

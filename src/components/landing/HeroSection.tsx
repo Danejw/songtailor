@@ -26,7 +26,7 @@ export const HeroSection = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Button 
             size="lg"
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/order")}
             className="text-lg px-8 py-6 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 group relative overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
           >
             <span className="relative z-10 flex items-center">
