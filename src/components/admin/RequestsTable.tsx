@@ -44,11 +44,11 @@ const fetchOrdersWithDetails = async () => {
         style,
         lyrics,
         themes,
-        reference_links
-      ),
-      cover_images (
-        id,
-        file_path
+        reference_links,
+        cover_images (
+          id,
+          file_path
+        )
       )
     `)
     .order('created_at', { ascending: false });
