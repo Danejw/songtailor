@@ -14,35 +14,36 @@ const Login = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         navigate(returnTo);
       } else if (event === 'INITIAL_SESSION') {
         if (session) navigate(returnTo);
-      } else if (event === 'TOKEN_REFRESHED') {
-        // Ignore token refresh events
-      } else if (event === 'SIGNED_OUT') {
+      } else if (event === 'SIGNED_OUT' || event === 'PASSWORD_RECOVERY') {
         setError(null);
-      } else if (event === 'PASSWORD_RECOVERY') {
-        setError(null);
-      } else {
-        // Handle potential error events
-        if (event.includes('ERROR')) {
-          if (error?.includes('Invalid login credentials')) {
-            setError("Invalid email or password. Please try again.");
-          } else if (error?.includes('Email not confirmed')) {
-            setError("Please check your email to confirm your account before signing in.");
-          } else {
-            setError("An error occurred during authentication.");
-          }
-        }
       }
     });
 
+    // Set up error handler for auth state changes
+    const handleError = (error: Error) => {
+      const errorMessage = error.message;
+      if (errorMessage.includes('email_not_confirmed')) {
+        setError("Please check your email and click the confirmation link before signing in.");
+      } else if (errorMessage.includes('Invalid login credentials')) {
+        setError("Invalid email or password. Please try again.");
+      } else {
+        setError("An error occurred during authentication. Please try again.");
+      }
+    };
+
+    // Subscribe to auth error events
+    const { data: { subscription: errorSubscription } } = supabase.auth.onError(handleError);
+
     return () => {
       subscription.unsubscribe();
+      errorSubscription.unsubscribe();
     };
-  }, [navigate, returnTo, error]);
+  }, [navigate, returnTo]);
 
   return (
     <div className="relative min-h-screen flex items-center justify-center">
