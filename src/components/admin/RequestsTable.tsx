@@ -45,7 +45,7 @@ const fetchOrdersWithDetails = async () => {
         lyrics,
         themes,
         reference_links,
-        cover_images (
+        cover_images!cover_images_song_id_fkey (
           id,
           file_path
         )
