@@ -20,14 +20,14 @@ const fetchOrdersWithDetails = async () => {
     .from('orders')
     .select(`
       *,
-      songs (
+      songs!orders_song_id_fkey (
         title,
         style,
         lyrics,
         themes,
         reference_links
       ),
-      profiles:user_id (
+      profiles!orders_user_id_fkey (
         email
       )
     `)
@@ -46,13 +46,9 @@ export function RequestsTable() {
   const { data: orders = [], refetch } = useQuery({
     queryKey: ['orders-with-details'],
     queryFn: fetchOrdersWithDetails,
-    onError: (error: any) => {
-      toast({
-        title: "Error fetching orders",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    meta: {
+      errorMessage: "Error fetching orders"
+    }
   });
 
   useEffect(() => {
