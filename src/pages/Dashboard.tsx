@@ -55,7 +55,7 @@ export default function Dashboard() {
         setProfile({ email: session.user.email });
       }
 
-      // Fetch orders with explicit foreign key relationships
+      // Fetch orders with nested songs and their cover images
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select(`
@@ -63,10 +63,10 @@ export default function Dashboard() {
           songs!orders_song_id_fkey (
             title,
             style,
-            themes
-          ),
-          cover_images!cover_images_song_id_fkey (
-            file_path
+            themes,
+            cover_images (
+              file_path
+            )
           )
         `)
         .eq('user_id', session.user.id)
