@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export const Navigation = () => {
   const navigate = useNavigate();
@@ -9,12 +9,12 @@ export const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <span className="text-2xl font-bold text-purple-600">SongTailor</span>
+            <Link to="/" className="text-2xl font-bold text-purple-600">SongTailor</Link>
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-gray-600 hover:text-purple-600">Home</a>
-            <a href="#how-it-works" className="text-gray-600 hover:text-purple-600">How It Works</a>
+            <Link to="/" className="text-gray-600 hover:text-purple-600">Home</Link>
+            <Link to="/how-it-works" className="text-gray-600 hover:text-purple-600">How It Works</Link>
             <a href="#pricing" className="text-gray-600 hover:text-purple-600">Pricing</a>
             <a href="#contact" className="text-gray-600 hover:text-purple-600">Contact</a>
             <Button 
