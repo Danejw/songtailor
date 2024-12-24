@@ -4,24 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { FileUploader } from "./FileUploader";
+import { OrderDetailsHeader } from "./OrderDetailsHeader";
+import { OrderUserInfo } from "./OrderUserInfo";
+import { OrderSongInfo } from "./OrderSongInfo";
+import { OrderFileUploads } from "./OrderFileUploads";
+import type { Order } from "./types";
 
 interface RequestDetailsDialogProps {
-  order: any;
+  order: Order | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onOrderUpdated: () => void;
@@ -106,81 +98,26 @@ export function RequestDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>Order Details</DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-3xl max-h-[90vh]">
+        <OrderDetailsHeader />
+        
+        <div className="space-y-6 overflow-y-auto max-h-[calc(90vh-8rem)] p-1">
+          <OrderUserInfo 
+            email={order.profiles?.email || ""}
+            status={status}
+            onStatusChange={setStatus}
+          />
+          
+          <OrderSongInfo song={order.songs} />
+          
+          <OrderFileUploads
+            includesCoverImage={order.includes_cover_image || false}
+            onFileUploaded={handleFileUploaded}
+            isUploading={isUploading}
+            setIsUploading={setIsUploading}
+          />
 
-        <div className="grid gap-6 py-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>User Email</Label>
-              <Input value={order.profiles?.email || ""} readOnly />
-            </div>
-            <div>
-              <Label>Order Status</Label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="pending_lyrics_approval">Pending Lyrics Approval</SelectItem>
-                  <SelectItem value="in_production">In Production</SelectItem>
-                  <SelectItem value="ready_for_review">Ready for Review</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div>
-            <Label>Song Title</Label>
-            <Input value={order.songs?.title || ""} readOnly />
-          </div>
-
-          <div>
-            <Label>Style</Label>
-            <Input value={order.songs?.style || ""} readOnly />
-          </div>
-
-          <div>
-            <Label>Lyrics</Label>
-            <Textarea value={order.songs?.lyrics || ""} readOnly className="min-h-[100px]" />
-          </div>
-
-          <div>
-            <Label>Reference Links</Label>
-            <Input value={order.songs?.reference_links || ""} readOnly />
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <Label>Upload Song File</Label>
-              <FileUploader
-                bucket="songs"
-                onUploaded={(filePath) => handleFileUploaded(filePath, 'song')}
-                accept=".mp3,.wav"
-                isUploading={isUploading}
-                setIsUploading={setIsUploading}
-              />
-            </div>
-
-            {order.includes_cover_image && (
-              <div>
-                <Label>Upload Cover Image</Label>
-                <FileUploader
-                  bucket="covers"
-                  onUploaded={(filePath) => handleFileUploaded(filePath, 'cover')}
-                  accept="image/*"
-                  isUploading={isUploading}
-                  setIsUploading={setIsUploading}
-                />
-              </div>
-            )}
-          </div>
-
-          <div className="flex justify-end space-x-4">
+          <div className="flex justify-end space-x-4 sticky bottom-0 bg-background pt-4">
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
