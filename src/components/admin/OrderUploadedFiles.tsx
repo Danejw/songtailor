@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { AudioWaveform, Image, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import type { Order, OrderSong } from "./types";
 
 interface OrderUploadedFilesProps {
@@ -19,6 +20,18 @@ export function OrderUploadedFiles({
     return null;
   }
 
+  const getPublicUrl = (bucket: string, filePath: string) => {
+    // Extract just the filename from the full path
+    const fileName = filePath.split('/').pop();
+    if (!fileName) return '';
+    
+    const { data: { publicUrl } } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(fileName);
+    
+    return publicUrl;
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Uploaded Files</h3>
@@ -35,7 +48,7 @@ export function OrderUploadedFiles({
                 <div className="flex-1">
                   <p className="font-medium">Song File</p>
                   <audio controls className="w-full mt-2">
-                    <source src={orderSong.song_url} type="audio/mpeg" />
+                    <source src={getPublicUrl('songs', orderSong.song_url)} type="audio/mpeg" />
                     Your browser does not support the audio element.
                   </audio>
                 </div>
@@ -56,7 +69,7 @@ export function OrderUploadedFiles({
                 <div className="flex-1">
                   <p className="font-medium">Cover Image</p>
                   <img 
-                    src={cover.file_path} 
+                    src={getPublicUrl('covers', cover.file_path)} 
                     alt="Cover" 
                     className="w-full h-40 object-cover rounded-lg mt-2"
                   />
