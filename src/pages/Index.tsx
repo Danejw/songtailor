@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Testimonials } from "@/components/Testimonials";
 import { Footer } from "@/components/Footer";
-import { Music, Heart, Clock, Star, Gift, Sparkles } from "lucide-react";
+import { Music, Heart, Star, Gift, Sparkles } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -52,10 +52,10 @@ const Index = () => {
             </div>
             <div className="text-center p-6">
               <div className="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
-                <Clock className="w-8 h-8 text-purple-600" />
+                <Star className="w-8 h-8 text-purple-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Satisfaction Guaranteed</h3>
-              <p className="text-gray-600">Get unlimited revisions until you're completely happy with your song</p>
+              <h3 className="text-xl font-semibold mb-3">Professional Production</h3>
+              <p className="text-gray-600">Studio-quality sound with expert musicians and producers</p>
             </div>
           </div>
         </div>
