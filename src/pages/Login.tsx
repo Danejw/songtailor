@@ -24,24 +24,8 @@ const Login = () => {
       }
     });
 
-    // Set up error handler for auth state changes
-    const handleError = (error: Error) => {
-      const errorMessage = error.message;
-      if (errorMessage.includes('email_not_confirmed')) {
-        setError("Please check your email and click the confirmation link before signing in.");
-      } else if (errorMessage.includes('Invalid login credentials')) {
-        setError("Invalid email or password. Please try again.");
-      } else {
-        setError("An error occurred during authentication. Please try again.");
-      }
-    };
-
-    // Subscribe to auth error events
-    const { data: { subscription: errorSubscription } } = supabase.auth.onError(handleError);
-
     return () => {
       subscription.unsubscribe();
-      errorSubscription.unsubscribe();
     };
   }, [navigate, returnTo]);
 
@@ -67,6 +51,15 @@ const Login = () => {
                 appearance={{ theme: ThemeSupa }}
                 theme="light"
                 providers={[]}
+                onError={(error) => {
+                  if (error.message.includes('email_not_confirmed')) {
+                    setError("Please check your email and click the confirmation link before signing in.");
+                  } else if (error.message.includes('Invalid login credentials')) {
+                    setError("Invalid email or password. Please try again.");
+                  } else {
+                    setError("An error occurred during authentication. Please try again.");
+                  }
+                }}
               />
             </CardContent>
           </Card>
