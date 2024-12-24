@@ -115,7 +115,7 @@ export function RequestDetailsDialog({
           />
 
           {/* Display uploaded files section */}
-          {(order.final_song_url || order.cover_images?.length > 0) && (
+          {(order.final_song_url || order.songs?.cover_images?.length > 0) && (
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Uploaded Files</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -132,7 +132,7 @@ export function RequestDetailsDialog({
                   </div>
                 )}
                 
-                {order.cover_images?.map((cover: any) => (
+                {order.songs?.cover_images?.map((cover) => (
                   <div key={cover.id} className="flex items-center gap-2 p-4 border rounded-lg">
                     <Image className="w-5 h-5 text-green-500" />
                     <div className="flex-1">
