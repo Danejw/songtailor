@@ -44,15 +44,30 @@ const fetchOrdersWithDetails = async () => {
         lyrics,
         themes,
         reference_links
-      ),
-      profiles (
-        email
       )
     `)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data as unknown as Order[];
+
+  // Fetch profiles separately since there's no direct foreign key
+  if (data) {
+    const userIds = [...new Set(data.map(order => order.user_id))];
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, email')
+      .in('id', userIds);
+
+    // Merge profiles into orders
+    const ordersWithProfiles = data.map(order => ({
+      ...order,
+      profiles: profiles?.find(profile => profile.id === order.user_id) || null
+    }));
+
+    return ordersWithProfiles as Order[];
+  }
+
+  return [];
 };
 
 export function RequestsTable() {
