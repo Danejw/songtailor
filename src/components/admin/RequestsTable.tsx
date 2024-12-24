@@ -17,8 +17,10 @@ import { RequestDetailsDialog } from "./RequestDetailsDialog";
 
 const fetchOrdersWithDetails = async () => {
   // First fetch profiles to ensure they exist
-  const { data: session } = await supabase.auth.getSession();
-  if (session?.user) {
+  const { data: sessionData } = await supabase.auth.getSession();
+  const session = sessionData?.session;
+  
+  if (session?.user?.id) {
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select()
@@ -39,7 +41,7 @@ const fetchOrdersWithDetails = async () => {
     .from('orders')
     .select(`
       *,
-      songs (
+      songs!fk_song (
         title,
         style,
         lyrics,
