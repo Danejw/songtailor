@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminStats } from "@/components/admin/AdminStats";
 import { RequestsTable } from "@/components/admin/RequestsTable";
-import { NotificationsPanel } from "@/components/admin/NotificationsPanel";
 import { Loader2 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -77,15 +76,9 @@ export default function AdminDashboard() {
       <AdminHeader />
       
       <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-3 space-y-6">
-            <AdminStats />
-            <RequestsTable />
-          </div>
-          
-          <div className="space-y-6">
-            <NotificationsPanel />
-          </div>
+        <div className="space-y-6">
+          <AdminStats />
+          <RequestsTable />
         </div>
       </main>
     </div>
