@@ -2,7 +2,26 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,11 +29,39 @@ import { PriceSummary } from "./PriceSummary";
 import { PersonalInfo } from "./song-purchase/PersonalInfo";
 import { formSchema, FormValues } from "./song-purchase/types";
 
+// Define constants for select options
+const musicStyles = [
+  "Pop",
+  "Rock",
+  "Jazz",
+  "Classical",
+  "Hip Hop",
+  "Folk",
+  "Country",
+  "Electronic",
+  "R&B",
+  "Other",
+];
+
+const moods = [
+  "Happy",
+  "Sad",
+  "Energetic",
+  "Romantic",
+  "Relaxing",
+  "Uplifting",
+  "Melancholic",
+  "Other",
+];
+
 export function SongPurchaseForm() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [basePrice] = useState(29.99);
   const [isLoading, setIsLoading] = useState(true);
+  const [showLyrics, setShowLyrics] = useState(false);
+  const [showOtherMusicStyle, setShowOtherMusicStyle] = useState(false);
+  const [showOtherMood, setShowOtherMood] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -89,7 +136,7 @@ export function SongPurchaseForm() {
             amount: totalAmount,
             includes_both_versions: data.wantSecondSong,
             includes_cover_image: data.wantCoverImage,
-            status: 'paid', // Changed from 'completed' to 'paid'
+            status: 'paid',
             payment_status: 'succeeded',
             metadata: {
               formData: data
