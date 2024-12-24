@@ -40,23 +40,30 @@ export default function Dashboard() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      // Fetch profile
-      const { data: profileData } = await supabase
+      // Fetch profile using maybeSingle() instead of single()
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
-        .single();
+        .maybeSingle();
 
-      if (profileData) {
-        setProfile(profileData);
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        toast({
+          title: "Error",
+          description: "Failed to load profile data",
+          variant: "destructive",
+        });
+      } else {
+        setProfile(profileData || { email: session.user.email });
       }
 
-      // Fetch orders
-      const { data: ordersData } = await supabase
+      // Fetch orders with explicit foreign key relationship
+      const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select(`
           *,
-          songs (
+          songs!fk_song (
             title,
             style,
             themes
@@ -68,7 +75,14 @@ export default function Dashboard() {
         .eq('user_id', session.user.id)
         .order('created_at', { ascending: false });
 
-      if (ordersData) {
+      if (ordersError) {
+        console.error('Error fetching orders:', ordersError);
+        toast({
+          title: "Error",
+          description: "Failed to load orders data",
+          variant: "destructive",
+        });
+      } else if (ordersData) {
         setActiveOrders(ordersData.filter(order => order.status !== 'completed'));
         setCompletedOrders(ordersData.filter(order => order.status === 'completed'));
       }
@@ -81,6 +95,7 @@ export default function Dashboard() {
         description: "Failed to load dashboard data",
         variant: "destructive",
       });
+      setIsLoading(false);
     }
   };
 
