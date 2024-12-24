@@ -78,6 +78,22 @@ export const OrderDetailsModal: FC<OrderDetailsModalProps> = ({
                   </span>
                 </div>
               )}
+              {order.includes_cover_image && (
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">Cover Image</Badge>
+                  <span className="text-muted-foreground">
+                    This order includes a cover image
+                  </span>
+                </div>
+              )}
+              {order.includes_both_versions && order.metadata?.formData?.wantSecondCoverImage && (
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">Second Cover Image</Badge>
+                  <span className="text-muted-foreground">
+                    This order includes a cover image for the second version
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
