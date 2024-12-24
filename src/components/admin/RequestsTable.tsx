@@ -27,7 +27,7 @@ const fetchOrdersWithDetails = async () => {
         themes,
         reference_links
       ),
-      user:profiles!orders_user_id_fkey (
+      profiles (
         email
       )
     `)
@@ -73,7 +73,7 @@ export function RequestsTable() {
     return (
       order.id.toLowerCase().includes(searchLower) ||
       order.songs?.title?.toLowerCase().includes(searchLower) ||
-      order.user?.email?.toLowerCase().includes(searchLower)
+      order.profiles?.email?.toLowerCase().includes(searchLower)
     );
   });
 
@@ -104,7 +104,7 @@ export function RequestsTable() {
             {filteredOrders.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="font-medium">{order.id.slice(0, 8)}</TableCell>
-                <TableCell>{order.user?.email}</TableCell>
+                <TableCell>{order.profiles?.email}</TableCell>
                 <TableCell>{order.songs?.title || "Untitled"}</TableCell>
                 <TableCell>{order.status}</TableCell>
                 <TableCell>{format(new Date(order.created_at), "MMM d, yyyy")}</TableCell>
