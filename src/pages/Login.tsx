@@ -51,16 +51,15 @@ const Login = () => {
                 appearance={{ theme: ThemeSupa }}
                 theme="light"
                 providers={[]}
-                onError={(error) => {
-                  if (error.message.includes('email_not_confirmed')) {
-                    setError("Please check your email and click the confirmation link before signing in.");
-                  } else if (error.message.includes('Invalid login credentials')) {
-                    setError("Invalid email or password. Please try again.");
-                  } else {
-                    setError(error.message || "An error occurred during authentication. Please try again.");
-                  }
+                localization={{
+                  variables: {
+                    sign_in: {
+                      email_label: 'Email',
+                      password_label: 'Password',
+                    },
+                  },
                 }}
-                view="sign_in"
+                onlyThirdPartyProviders={false}
               />
             </CardContent>
           </Card>
