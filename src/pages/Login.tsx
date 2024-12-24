@@ -17,25 +17,24 @@ const Login = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         navigate(returnTo);
-      } else if (event === 'USER_UPDATED') {
-        setError(null);
-      } else if (event === 'SIGNED_OUT') {
-        setError(null);
-      } else if (event === 'USER_DELETED') {
-        setError(null);
-      } else if (event === 'PASSWORD_RECOVERY') {
-        setError(null);
       } else if (event === 'INITIAL_SESSION') {
         if (session) navigate(returnTo);
       } else if (event === 'TOKEN_REFRESHED') {
         // Ignore token refresh events
+      } else if (event === 'SIGNED_OUT') {
+        setError(null);
+      } else if (event === 'PASSWORD_RECOVERY') {
+        setError(null);
       } else {
         // Handle potential error events
         if (event.includes('ERROR')) {
-          const errorMessage = event.includes('EMAIL_NOT_CONFIRMED')
-            ? "Please check your email to confirm your account before signing in."
-            : "An error occurred during authentication.";
-          setError(errorMessage);
+          if (error?.includes('Invalid login credentials')) {
+            setError("Invalid email or password. Please try again.");
+          } else if (error?.includes('Email not confirmed')) {
+            setError("Please check your email to confirm your account before signing in.");
+          } else {
+            setError("An error occurred during authentication.");
+          }
         }
       }
     });
@@ -43,7 +42,7 @@ const Login = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, returnTo]);
+  }, [navigate, returnTo, error]);
 
   return (
     <div className="relative min-h-screen flex items-center justify-center">
