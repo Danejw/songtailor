@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Check, Sparkles, Star } from "lucide-react";
+import { ArrowRight, Sparkles, Star } from "lucide-react";
 
 export const HeroSection = () => {
   const navigate = useNavigate();
@@ -42,18 +42,6 @@ export const HeroSection = () => {
           >
             Learn More
           </Button>
-        </div>
-        <div className="mt-12 flex flex-wrap justify-center gap-8 text-gray-600">
-          {[
-            "100% Satisfaction",
-            "Free Revisions",
-            "Money Back Guarantee"
-          ].map((text, index) => (
-            <div key={index} className="flex items-center group hover:bg-white/50 p-2 rounded-lg transition-all duration-300">
-              <Check className="text-green-500 mr-2 group-hover:scale-110 transition-transform" />
-              <span className="group-hover:text-green-600 transition-colors">{text}</span>
-            </div>
-          ))}
         </div>
       </div>
     </section>
