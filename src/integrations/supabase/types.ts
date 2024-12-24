@@ -123,6 +123,42 @@ export type Database = {
         }
         Relationships: []
       }
+      cover_images: {
+        Row: {
+          created_at: string
+          file_path: string
+          id: string
+          song_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_path: string
+          id?: string
+          song_id: string
+        }
+        Update: {
+          created_at?: string
+          file_path?: string
+          id?: string
+          song_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cover_images_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_song"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       elf_presence: {
         Row: {
           client_id: string
@@ -306,6 +342,174 @@ export type Database = {
           name?: string
           response?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      lyrics_revisions: {
+        Row: {
+          content: string
+          created_at: string
+          feedback: string | null
+          id: string
+          song_id: string
+          status: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          song_id: string
+          status?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          song_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_song"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lyrics_revisions_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          includes_both_versions: boolean | null
+          includes_cover_image: boolean | null
+          song_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          includes_both_versions?: boolean | null
+          includes_cover_image?: boolean | null
+          song_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          includes_both_versions?: boolean | null
+          includes_cover_image?: boolean | null
+          song_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_song"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      song_options: {
+        Row: {
+          created_at: string
+          file_path: string
+          id: string
+          is_selected: boolean | null
+          song_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_path: string
+          id?: string
+          is_selected?: boolean | null
+          song_id: string
+        }
+        Update: {
+          created_at?: string
+          file_path?: string
+          id?: string
+          is_selected?: boolean | null
+          song_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_song"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "song_options_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      songs: {
+        Row: {
+          created_at: string
+          id: string
+          lyrics: string | null
+          reference_links: string | null
+          status: string
+          style: string
+          themes: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lyrics?: string | null
+          reference_links?: string | null
+          status?: string
+          style: string
+          themes: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lyrics?: string | null
+          reference_links?: string | null
+          status?: string
+          style?: string
+          themes?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
