@@ -55,7 +55,7 @@ const fetchOrdersWithDetails = async () => {
           file_path
         )
       ),
-      profiles!orders_user_id_fkey (
+      profiles (
         id,
         email
       )
@@ -67,12 +67,7 @@ const fetchOrdersWithDetails = async () => {
     throw ordersError;
   }
 
-  if (!ordersData) {
-    return [];
-  }
-
-  // Type assertion to ensure the data matches our Order type
-  return ordersData as unknown as Order[];
+  return ordersData as Order[];
 };
 
 export function RequestsTable() {
