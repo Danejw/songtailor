@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -30,6 +30,49 @@ export function RequestDetailsDialog({
   const [status, setStatus] = useState(order?.status || "pending");
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    if (!order) return;
+
+    // Subscribe to changes in the orders table
+    const ordersChannel = supabase
+      .channel('order-details')
+      .on(
+        'postgres_changes',
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'orders',
+          filter: `id=eq.${order.id}`
+        },
+        () => {
+          onOrderUpdated();
+        }
+      )
+      .subscribe();
+
+    // Subscribe to changes in the cover_images table
+    const coverImagesChannel = supabase
+      .channel('cover-images')
+      .on(
+        'postgres_changes',
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'cover_images',
+          filter: `song_id=eq.${order.song_id}`
+        },
+        () => {
+          onOrderUpdated();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(ordersChannel);
+      supabase.removeChannel(coverImagesChannel);
+    };
+  }, [order, onOrderUpdated]);
 
   if (!order) return null;
 
