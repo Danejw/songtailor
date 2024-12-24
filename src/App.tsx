@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import HowItWorks from "./pages/HowItWorks";
 import Pricing from "./pages/Pricing";
+import SongPurchaseForm from "./components/SongPurchaseForm";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/order" element={<SongPurchaseForm />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
