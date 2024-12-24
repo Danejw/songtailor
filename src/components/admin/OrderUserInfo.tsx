@@ -19,11 +19,20 @@ export function OrderUserInfo({ email, status, onStatusChange }: OrderUserInfoPr
     <div className="grid grid-cols-2 gap-4">
       <div>
         <Label>User Email</Label>
-        <Input value={email || ""} readOnly />
+        <Input 
+          value={email || ""} 
+          readOnly 
+          className="bg-gray-50"
+          aria-label="User email"
+        />
       </div>
       <div>
         <Label>Order Status</Label>
-        <Select value={status} onValueChange={onStatusChange}>
+        <Select 
+          value={status} 
+          onValueChange={onStatusChange}
+          aria-label="Order status"
+        >
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
