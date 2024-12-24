@@ -6,8 +6,9 @@ export const HeroSection = () => {
   const navigate = useNavigate();
   
   return (
-    <section className="relative py-32 px-4 bg-gradient-to-br from-purple-100 via-white to-blue-100 overflow-hidden grid-pattern">
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.1)_0%,rgba(255,255,255,0.8)_100%)]" />
+    <section className="relative py-32 px-4 overflow-hidden">
+      <div className="fixed inset-0 bg-gradient-to-br from-purple-100 via-white to-blue-100 grid-pattern -z-10" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.1)_0%,rgba(255,255,255,0.8)_100%)] -z-10" />
       <div className="container mx-auto text-center relative">
         <div className="absolute top-10 left-1/2 -translate-x-1/2 animate-float">
           <Sparkles className="w-6 h-6 text-purple-500 animate-pulse" />

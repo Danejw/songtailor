@@ -6,7 +6,8 @@ export const CallToAction = () => {
   const navigate = useNavigate();
   
   return (
-    <section className="py-24 bg-gradient-to-br from-purple-600 via-purple-700 to-blue-700 text-white relative overflow-hidden grid-pattern">
+    <section className="py-24 relative overflow-hidden">
+      <div className="fixed inset-0 bg-gradient-to-br from-purple-600 via-purple-700 to-blue-700 grid-pattern -z-10" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.1)_0%,rgba(255,255,255,0)_100%)]" />
       <Sparkles className="absolute top-10 right-10 w-6 h-6 text-white/50 animate-pulse" />
       <Sparkles className="absolute bottom-10 left-10 w-6 h-6 text-white/50 animate-pulse" />
@@ -16,10 +17,10 @@ export const CallToAction = () => {
             <Star className="w-4 h-4 inline-block mr-2" />
             Ready to Start?
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-white">
             Ready to Create Your Perfect Song?
           </h2>
-          <p className="text-xl mb-12 opacity-90">
+          <p className="text-xl mb-12 opacity-90 text-white">
             Join thousands of happy customers who have turned their stories into beautiful songs
           </p>
           <Button 

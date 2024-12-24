@@ -2,7 +2,8 @@ import { Music, Heart, Star, Sparkles } from "lucide-react";
 
 export const FeaturesSection = () => {
   return (
-    <section className="py-24 bg-gradient-to-b from-white to-purple-50/30 grid-pattern-dark relative">
+    <section className="py-24 relative">
+      <div className="fixed inset-0 bg-gradient-to-b from-white to-purple-50/30 grid-pattern-dark -z-10" />
       <div className="absolute inset-0 bg-white/50" />
       <div className="container mx-auto px-4 relative">
         <div className="text-center mb-16">
