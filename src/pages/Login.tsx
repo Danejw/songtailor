@@ -19,19 +19,29 @@ const Login = () => {
         navigate(returnTo);
       } else if (event === 'USER_UPDATED') {
         setError(null);
-      }
-    });
-
-    // Also listen for auth errors
-    const authListener = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
+      } else if (event === 'SIGNED_OUT') {
         setError(null);
+      } else if (event === 'USER_DELETED') {
+        setError(null);
+      } else if (event === 'PASSWORD_RECOVERY') {
+        setError(null);
+      } else if (event === 'INITIAL_SESSION') {
+        if (session) navigate(returnTo);
+      } else if (event === 'TOKEN_REFRESHED') {
+        // Ignore token refresh events
+      } else {
+        // Handle potential error events
+        if (event.includes('ERROR')) {
+          const errorMessage = event.includes('EMAIL_NOT_CONFIRMED')
+            ? "Please check your email to confirm your account before signing in."
+            : "An error occurred during authentication.";
+          setError(errorMessage);
+        }
       }
     });
 
     return () => {
       subscription.unsubscribe();
-      authListener.data.subscription.unsubscribe();
     };
   }, [navigate, returnTo]);
 
@@ -57,13 +67,6 @@ const Login = () => {
                 appearance={{ theme: ThemeSupa }}
                 theme="light"
                 providers={[]}
-                onError={(error) => {
-                  if (error.message === "Email not confirmed") {
-                    setError("Please check your email to confirm your account before signing in.");
-                  } else {
-                    setError(error.message);
-                  }
-                }}
               />
             </CardContent>
           </Card>
