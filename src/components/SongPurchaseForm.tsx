@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -24,6 +24,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { PriceSummary } from "./PriceSummary";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -71,6 +73,7 @@ export function SongPurchaseForm() {
   const [showLyrics, setShowLyrics] = useState(false);
   const [showOtherMusicStyle, setShowOtherMusicStyle] = useState(false);
   const [showOtherMood, setShowOtherMood] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -81,20 +84,36 @@ export function SongPurchaseForm() {
     },
   });
 
-  const calculateTotal = (values: Partial<FormValues>) => {
-    let total = basePrice;
-    if (values.wantCoverImage) total += 5;
-    if (values.wantSecondSong) {
-      total += 15;
-      if (values.wantSecondCoverImage) total += 5;
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to make a purchase",
+      });
+      navigate("/login", { state: { returnTo: "/order" } });
     }
-    return total;
+    setIsLoading(false);
   };
 
   const onSubmit = async (data: FormValues) => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to make a purchase",
+        });
+        navigate("/login", { state: { returnTo: "/order" } });
+        return;
+      }
+
       // Here we would typically handle the form submission
-      // For now, we'll just show a success message and redirect
       toast({
         title: "Order submitted successfully!",
         description: "Redirecting to payment...",
@@ -111,8 +130,9 @@ export function SongPurchaseForm() {
     }
   };
 
-  const watchedValues = form.watch();
-  const total = calculateTotal(watchedValues);
+  if (isLoading) {
+    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+  }
 
   return (
     <div className="max-w-3xl mx-auto p-6">
@@ -426,7 +446,7 @@ export function SongPurchaseForm() {
               )}
             />
 
-            {watchedValues.wantSecondSong && (
+            {form.watch().wantSecondSong && (
               <FormField
                 control={form.control}
                 name="wantSecondCoverImage"
@@ -453,37 +473,10 @@ export function SongPurchaseForm() {
           </div>
 
           {/* Price Summary */}
-          <div className="rounded-lg bg-muted p-6 space-y-2">
-            <h3 className="text-xl font-semibold mb-4">Order Summary</h3>
-            <div className="flex justify-between">
-              <span>Base Package</span>
-              <span>${basePrice.toFixed(2)}</span>
-            </div>
-            {watchedValues.wantCoverImage && (
-              <div className="flex justify-between">
-                <span>Cover Image</span>
-                <span>+$5.00</span>
-              </div>
-            )}
-            {watchedValues.wantSecondSong && (
-              <div className="flex justify-between">
-                <span>Second Song</span>
-                <span>+$15.00</span>
-              </div>
-            )}
-            {watchedValues.wantSecondSong && watchedValues.wantSecondCoverImage && (
-              <div className="flex justify-between">
-                <span>Second Song Cover Image</span>
-                <span>+$5.00</span>
-              </div>
-            )}
-            <div className="pt-4 border-t mt-4">
-              <div className="flex justify-between font-bold">
-                <span>Total</span>
-                <span>${total.toFixed(2)}</span>
-              </div>
-            </div>
-          </div>
+          <PriceSummary 
+            basePrice={basePrice}
+            values={form.watch()}
+          />
 
           <Button type="submit" className="w-full">
             Submit and Continue to Payment
