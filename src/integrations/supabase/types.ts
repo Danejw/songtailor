@@ -128,28 +128,28 @@ export type Database = {
           created_at: string
           file_path: string
           id: string
-          order_song_id: string | null
+          order_song_id: string
           song_id: string
         }
         Insert: {
           created_at?: string
           file_path: string
           id?: string
-          order_song_id?: string | null
+          order_song_id: string
           song_id: string
         }
         Update: {
           created_at?: string
           file_path?: string
           id?: string
-          order_song_id?: string | null
+          order_song_id?: string
           song_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "cover_images_order_song_id_fkey"
             columns: ["order_song_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "order_songs"
             referencedColumns: ["id"]
           },
