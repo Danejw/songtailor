@@ -31,7 +31,8 @@ const fetchOrdersWithDetails = async () => {
       // Create profile if it doesn't exist
       await supabase.from('profiles').insert({
         id: session.user.id,
-        email: session.user.email
+        email: session.user.email,
+        is_admin: true // Since this is the admin dashboard
       });
     }
   }
@@ -48,7 +49,7 @@ const fetchOrdersWithDetails = async () => {
         themes,
         reference_links
       ),
-      profiles!orders_user_id_fkey (
+      profiles (
         email
       )
     `)
@@ -93,8 +94,8 @@ export function RequestsTable() {
     const searchLower = searchQuery.toLowerCase();
     return (
       order.id.toLowerCase().includes(searchLower) ||
-      order.songs?.title?.toLowerCase().includes(searchLower) ||
-      order.profiles?.email?.toLowerCase().includes(searchLower)
+      (order.songs?.title || '').toLowerCase().includes(searchLower) ||
+      (order.profiles?.email || '').toLowerCase().includes(searchLower)
     );
   });
 
@@ -125,7 +126,7 @@ export function RequestsTable() {
             {filteredOrders.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="font-medium">{order.id.slice(0, 8)}</TableCell>
-                <TableCell>{order.profiles?.email}</TableCell>
+                <TableCell>{order.profiles?.email || 'N/A'}</TableCell>
                 <TableCell>{order.songs?.title || "Untitled"}</TableCell>
                 <TableCell>{order.status}</TableCell>
                 <TableCell>{format(new Date(order.created_at), "MMM d, yyyy")}</TableCell>
