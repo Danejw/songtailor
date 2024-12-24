@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -6,11 +6,12 @@ import {
   DialogContent,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AudioWaveform, Image, Trash2 } from "lucide-react";
 import { OrderDetailsHeader } from "./OrderDetailsHeader";
 import { OrderUserInfo } from "./OrderUserInfo";
 import { OrderSongInfo } from "./OrderSongInfo";
 import { OrderFileUploads } from "./OrderFileUploads";
+import { OrderUploadedFiles } from "./OrderUploadedFiles";
+import { OrderRealTimeUpdates } from "./OrderRealTimeUpdates";
 import type { Order } from "./types";
 
 interface RequestDetailsDialogProps {
@@ -30,49 +31,6 @@ export function RequestDetailsDialog({
   const [status, setStatus] = useState(order?.status || "pending");
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  useEffect(() => {
-    if (!order) return;
-
-    // Subscribe to changes in the orders table
-    const ordersChannel = supabase
-      .channel('order-details')
-      .on(
-        'postgres_changes',
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'orders',
-          filter: `id=eq.${order.id}`
-        },
-        () => {
-          onOrderUpdated();
-        }
-      )
-      .subscribe();
-
-    // Subscribe to changes in the cover_images table
-    const coverImagesChannel = supabase
-      .channel('cover-images')
-      .on(
-        'postgres_changes',
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'cover_images',
-          filter: `song_id=eq.${order.song_id}`
-        },
-        () => {
-          onOrderUpdated();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(ordersChannel);
-      supabase.removeChannel(coverImagesChannel);
-    };
-  }, [order, onOrderUpdated]);
 
   if (!order) return null;
 
@@ -236,56 +194,12 @@ export function RequestDetailsDialog({
             onSongUpdated={onOrderUpdated}
           />
 
-          {/* Display uploaded files section */}
-          {(order.final_song_url || order.songs?.cover_images?.length > 0) && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Uploaded Files</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {order.final_song_url && (
-                  <div className="flex items-center gap-2 p-4 border rounded-lg">
-                    <AudioWaveform className="w-5 h-5 text-blue-500" />
-                    <div className="flex-1">
-                      <p className="font-medium">Final Song</p>
-                      <audio controls className="w-full mt-2">
-                        <source src={order.final_song_url} type="audio/mpeg" />
-                        Your browser does not support the audio element.
-                      </audio>
-                    </div>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={handleDeleteAudio}
-                      disabled={isDeleting}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                )}
-                
-                {order.songs?.cover_images?.map((cover) => (
-                  <div key={cover.id} className="flex items-center gap-2 p-4 border rounded-lg">
-                    <Image className="w-5 h-5 text-green-500" />
-                    <div className="flex-1">
-                      <p className="font-medium">Cover Image</p>
-                      <img 
-                        src={cover.file_path} 
-                        alt="Cover" 
-                        className="w-full h-40 object-cover rounded-lg mt-2"
-                      />
-                    </div>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => handleDeleteCoverImage(cover)}
-                      disabled={isDeleting}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <OrderUploadedFiles
+            order={order}
+            onDeleteAudio={handleDeleteAudio}
+            onDeleteCoverImage={handleDeleteCoverImage}
+            isDeleting={isDeleting}
+          />
           
           <OrderFileUploads
             includesCoverImage={order.includes_cover_image || false}
@@ -309,6 +223,11 @@ export function RequestDetailsDialog({
             </Button>
           </div>
         </div>
+
+        <OrderRealTimeUpdates 
+          order={order}
+          onOrderUpdated={onOrderUpdated}
+        />
       </DialogContent>
     </Dialog>
   );
