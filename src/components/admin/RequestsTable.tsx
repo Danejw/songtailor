@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { OrderSearchInput } from "./OrderSearchInput";
+import { OrderStatusFilter } from "./OrderStatusFilter";
 import { OrderTableRow } from "./OrderTableRow";
 import { RequestDetailsDialog } from "./RequestDetailsDialog";
 import type { Order } from "./types";
@@ -34,7 +35,7 @@ const fetchOrdersWithDetails = async () => {
     }
   }
 
-  const { data, error } = await supabase
+  const { data: ordersData, error: ordersError } = await supabase
     .from('orders')
     .select(`
       *,
@@ -48,18 +49,16 @@ const fetchOrdersWithDetails = async () => {
     `)
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  if (ordersError) throw ordersError;
 
-  // Fetch profiles separately since there's no direct foreign key
-  if (data) {
-    const userIds = [...new Set(data.map(order => order.user_id))];
+  if (ordersData) {
+    const userIds = [...new Set(ordersData.map(order => order.user_id))];
     const { data: profiles } = await supabase
       .from('profiles')
       .select('id, email')
       .in('id', userIds);
 
-    // Merge profiles into orders
-    const ordersWithProfiles = data.map(order => ({
+    const ordersWithProfiles = ordersData.map(order => ({
       ...order,
       profiles: profiles?.find(profile => profile.id === order.user_id) || null
     }));
@@ -73,6 +72,7 @@ const fetchOrdersWithDetails = async () => {
 export function RequestsTable() {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
@@ -102,12 +102,14 @@ export function RequestsTable() {
   }, [refetch]);
 
   const filteredOrders = orders.filter(order => {
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      order.id.toLowerCase().includes(searchLower) ||
-      (order.songs?.title || '').toLowerCase().includes(searchLower) ||
-      (order.profiles?.email || '').toLowerCase().includes(searchLower)
-    );
+    const matchesSearch = 
+      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (order.songs?.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (order.profiles?.email || '').toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
   });
 
   const handleViewDetails = (order: Order) => {
@@ -117,10 +119,14 @@ export function RequestsTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center gap-4">
         <OrderSearchInput 
           value={searchQuery}
           onChange={setSearchQuery}
+        />
+        <OrderStatusFilter
+          value={statusFilter}
+          onChange={setStatusFilter}
         />
       </div>
 
