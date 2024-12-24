@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
-import { Pricing } from "@/components/Pricing";
 import { Testimonials } from "@/components/Testimonials";
 import { Footer } from "@/components/Footer";
 
@@ -31,7 +30,6 @@ const Index = () => {
         </div>
       </section>
 
-      <Pricing />
       <Testimonials />
       <Footer />
     </div>

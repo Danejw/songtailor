@@ -15,7 +15,7 @@ export const Navigation = () => {
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-gray-600 hover:text-purple-600">Home</Link>
             <Link to="/how-it-works" className="text-gray-600 hover:text-purple-600">How It Works</Link>
-            <a href="#pricing" className="text-gray-600 hover:text-purple-600">Pricing</a>
+            <Link to="/pricing" className="text-gray-600 hover:text-purple-600">Pricing</Link>
             <a href="#contact" className="text-gray-600 hover:text-purple-600">Contact</a>
             <Button 
               variant="outline"
