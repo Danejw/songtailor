@@ -1,78 +1,19 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { PriceSummary } from "./PriceSummary";
-
-const formSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().optional(),
-  songTitle: z.string().optional(),
-  provideLyrics: z.enum(["yes", "no"]),
-  lyrics: z.string().optional(),
-  theme: z.string().optional(),
-  musicStyle: z.string(),
-  otherMusicStyle: z.string().optional(),
-  mood: z.string(),
-  otherMood: z.string().optional(),
-  references: z.string().optional(),
-  wantCoverImage: z.boolean(),
-  wantSecondSong: z.boolean(),
-  wantSecondCoverImage: z.boolean().optional(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
-const musicStyles = [
-  "Pop",
-  "Country",
-  "EDM",
-  "Hip-Hop",
-  "Acoustic/Folk",
-  "Rock",
-  "Other",
-];
-
-const moods = [
-  "Happy",
-  "Romantic",
-  "Sad/Emotional",
-  "Inspirational",
-  "Funny/Playful",
-  "Other",
-];
+import { PersonalInfo } from "./song-purchase/PersonalInfo";
+import { formSchema, FormValues } from "./song-purchase/types";
 
 export function SongPurchaseForm() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [basePrice] = useState(29.99);
-  const [showLyrics, setShowLyrics] = useState(false);
-  const [showOtherMusicStyle, setShowOtherMusicStyle] = useState(false);
-  const [showOtherMood, setShowOtherMood] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const form = useForm<FormValues>({
@@ -138,7 +79,7 @@ export function SongPurchaseForm() {
         (data.wantSecondSong ? 15 : 0) + 
         (data.wantSecondCoverImage ? 5 : 0);
 
-      // Create an order
+      // Create an order with 'paid' status
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert([
@@ -148,8 +89,8 @@ export function SongPurchaseForm() {
             amount: totalAmount,
             includes_both_versions: data.wantSecondSong,
             includes_cover_image: data.wantCoverImage,
-            status: 'completed', // Mocking successful payment
-            payment_status: 'succeeded', // Mocking successful payment
+            status: 'paid', // Changed from 'completed' to 'paid'
+            payment_status: 'succeeded',
             metadata: {
               formData: data
             }
@@ -165,7 +106,6 @@ export function SongPurchaseForm() {
         description: "Your song request has been received.",
       });
       
-      // Redirect to a success page or dashboard
       navigate("/dashboard");
     } catch (error) {
       console.error('Error:', error);
@@ -187,53 +127,8 @@ export function SongPurchaseForm() {
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {/* Personal Information */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Personal Information</h3>
-            
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Your name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email Address</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="your@email.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone Number (Optional)</FormLabel>
-                  <FormControl>
-                    <Input type="tel" placeholder="Your phone number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
+          <PersonalInfo form={form} />
+          
           {/* Song Details */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold">Song Details</h3>
