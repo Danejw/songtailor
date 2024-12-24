@@ -5,11 +5,11 @@ export interface Song {
   lyrics: string | null;
   themes: string | null;
   reference_links: string | null;
-  cover_images?: CoverImage[];  // Add this line
+  cover_images?: CoverImage[];
 }
 
 export interface Profile {
-  email: string | null;  // Made email nullable to match database schema
+  email: string | null;
 }
 
 export interface CoverImage {
@@ -17,15 +17,21 @@ export interface CoverImage {
   file_path: string;
 }
 
+export interface OrderSong {
+  id: string;
+  song_url: string | null;
+  is_primary: boolean;
+  cover_images?: CoverImage[];
+}
+
 export interface Order {
   id: string;
   created_at: string;
   status: string;
-  songs?: Song | null;  // Made songs optional and nullable
-  profiles?: Profile | null;  // Made profiles optional and nullable
+  songs?: Song | null;
+  profiles?: Profile | null;
   amount: number;
   delivery_status: string | null;
-  final_song_url: string | null;
   includes_both_versions: boolean | null;
   includes_cover_image: boolean | null;
   metadata: any | null;
@@ -33,4 +39,5 @@ export interface Order {
   payment_status: string | null;
   song_id: string;
   user_id: string;
+  order_songs?: OrderSong[];
 }

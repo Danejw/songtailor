@@ -128,33 +128,29 @@ export type Database = {
           created_at: string
           file_path: string
           id: string
+          order_song_id: string | null
           song_id: string
         }
         Insert: {
           created_at?: string
           file_path: string
           id?: string
+          order_song_id?: string | null
           song_id: string
         }
         Update: {
           created_at?: string
           file_path?: string
           id?: string
+          order_song_id?: string | null
           song_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "cover_images_song_id_fkey"
-            columns: ["song_id"]
+            foreignKeyName: "cover_images_order_song_id_fkey"
+            columns: ["order_song_id"]
             isOneToOne: false
-            referencedRelation: "songs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_song"
-            columns: ["song_id"]
-            isOneToOne: false
-            referencedRelation: "songs"
+            referencedRelation: "order_songs"
             referencedColumns: ["id"]
           },
         ]
@@ -387,12 +383,43 @@ export type Database = {
           },
         ]
       }
+      order_songs: {
+        Row: {
+          created_at: string
+          id: string
+          is_primary: boolean | null
+          order_id: string | null
+          song_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          order_id?: string | null
+          song_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          order_id?: string | null
+          song_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_songs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           amount: number
           created_at: string
           delivery_status: string | null
-          final_song_url: string | null
           id: string
           includes_both_versions: boolean | null
           includes_cover_image: boolean | null
@@ -407,7 +434,6 @@ export type Database = {
           amount: number
           created_at?: string
           delivery_status?: string | null
-          final_song_url?: string | null
           id?: string
           includes_both_versions?: boolean | null
           includes_cover_image?: boolean | null
@@ -422,7 +448,6 @@ export type Database = {
           amount?: number
           created_at?: string
           delivery_status?: string | null
-          final_song_url?: string | null
           id?: string
           includes_both_versions?: boolean | null
           includes_cover_image?: boolean | null

@@ -54,13 +54,14 @@ export function RequestDetailsDialog({
     }
   };
 
-  const handleDeleteAudio = async () => {
-    if (!order.final_song_url) return;
+  const handleDeleteAudio = async (orderSongId: string) => {
+    const orderSong = order.order_songs?.find(os => os.id === orderSongId);
+    if (!orderSong?.song_url) return;
     
     setIsDeleting(true);
     try {
       // Extract filename from URL
-      const fileName = order.final_song_url.split('/').pop();
+      const fileName = orderSong.song_url.split('/').pop();
       if (!fileName) throw new Error("Invalid file URL");
 
       // Delete from storage
@@ -70,11 +71,11 @@ export function RequestDetailsDialog({
 
       if (storageError) throw storageError;
 
-      // Update order record
+      // Update order_songs record
       const { error: dbError } = await supabase
-        .from('orders')
-        .update({ final_song_url: null })
-        .eq('id', order.id);
+        .from('order_songs')
+        .update({ song_url: null })
+        .eq('id', orderSongId);
 
       if (dbError) throw dbError;
 
@@ -94,7 +95,7 @@ export function RequestDetailsDialog({
     }
   };
 
-  const handleDeleteCoverImage = async (coverImage: { id: string, file_path: string }) => {
+  const handleDeleteCoverImage = async (coverImage: { id: string, file_path: string }, orderSongId: string) => {
     setIsDeleting(true);
     try {
       // Extract filename from URL
@@ -132,17 +133,35 @@ export function RequestDetailsDialog({
     }
   };
 
-  const handleFileUploaded = async (filePath: string, type: 'song' | 'cover') => {
-    const updates: any = {};
-    
+  const handleFileUploaded = async (filePath: string, type: 'song' | 'cover', orderSongId?: string) => {
+    if (!orderSongId) {
+      toast({
+        title: "Error uploading file",
+        description: "No order song ID provided",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (type === 'song') {
-      updates.final_song_url = filePath;
-      updates.status = 'completed';
+      const { error } = await supabase
+        .from('order_songs')
+        .update({ song_url: filePath })
+        .eq('id', orderSongId);
+
+      if (error) {
+        toast({
+          title: "Error saving song URL",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
     } else if (type === 'cover') {
       const { error } = await supabase
         .from('cover_images')
         .insert({
-          song_id: order.song_id,
+          order_song_id: orderSongId,
           file_path: filePath,
         });
 
@@ -156,25 +175,10 @@ export function RequestDetailsDialog({
       }
     }
 
-    if (Object.keys(updates).length > 0) {
-      const { error } = await supabase
-        .from('orders')
-        .update(updates)
-        .eq('id', order.id);
-
-      if (error) {
-        toast({
-          title: "Error updating order",
-          description: error.message,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Order updated successfully",
-        });
-        onOrderUpdated();
-      }
-    }
+    toast({
+      title: "File uploaded successfully",
+    });
+    onOrderUpdated();
   };
 
   return (
@@ -203,9 +207,11 @@ export function RequestDetailsDialog({
           
           <OrderFileUploads
             includesCoverImage={order.includes_cover_image || false}
+            includesBothVersions={order.includes_both_versions || false}
             onFileUploaded={handleFileUploaded}
             isUploading={isUploading}
             setIsUploading={setIsUploading}
+            orderSongs={order.order_songs || []}
           />
 
           <div className="flex justify-end space-x-4 sticky bottom-0 bg-background pt-4">
