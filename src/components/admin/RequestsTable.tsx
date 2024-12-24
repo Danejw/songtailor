@@ -38,14 +38,14 @@ const fetchOrdersWithDetails = async () => {
     .from('orders')
     .select(`
       *,
-      songs!fk_song (
+      songs:song_id (
         title,
         style,
         lyrics,
         themes,
         reference_links
       ),
-      profiles (
+      profiles:user_id (
         email
       )
     `)
