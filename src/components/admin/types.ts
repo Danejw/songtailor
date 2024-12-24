@@ -1,9 +1,9 @@
 export interface Song {
-  title: string;
-  style: string;
-  lyrics: string;
-  themes: string;
-  reference_links: string;
+  title: string | null;
+  style: string | null;
+  lyrics: string | null;
+  themes: string | null;
+  reference_links: string | null;
 }
 
 export interface Profile {

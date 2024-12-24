@@ -38,21 +38,21 @@ const fetchOrdersWithDetails = async () => {
     .from('orders')
     .select(`
       *,
-      songs:song_id (
+      songs (
         title,
         style,
         lyrics,
         themes,
         reference_links
       ),
-      profiles:user_id (
+      profiles (
         email
       )
     `)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data as Order[];
+  return data as unknown as Order[];
 };
 
 export function RequestsTable() {
