@@ -40,8 +40,8 @@ const Index = () => {
               <div className="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
                 <Music className="w-8 h-8 text-purple-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Professional Quality</h3>
-              <p className="text-gray-600">Studio-grade production with expert musicians and producers</p>
+              <h3 className="text-xl font-semibold mb-3">Quality Guaranteed</h3>
+              <p className="text-gray-600">Receive quality music that matches your vision and exceeds expectations</p>
             </div>
             <div className="text-center p-6">
               <div className="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
@@ -54,8 +54,8 @@ const Index = () => {
               <div className="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
                 <Clock className="w-8 h-8 text-purple-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Quick Turnaround</h3>
-              <p className="text-gray-600">Receive your custom song within days</p>
+              <h3 className="text-xl font-semibold mb-3">Satisfaction Guaranteed</h3>
+              <p className="text-gray-600">Get unlimited revisions until you're completely happy with your song</p>
             </div>
           </div>
         </div>
