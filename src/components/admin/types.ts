@@ -7,13 +7,23 @@ export interface Song {
 }
 
 export interface Profile {
-  email: string;
+  email: string | null;  // Made email nullable to match database schema
 }
 
 export interface Order {
   id: string;
   created_at: string;
   status: string;
-  songs?: Song;
-  profiles?: Profile;
+  songs?: Song | null;  // Made songs optional and nullable
+  profiles?: Profile | null;  // Made profiles optional and nullable
+  amount: number;
+  delivery_status: string | null;
+  final_song_url: string | null;
+  includes_both_versions: boolean | null;
+  includes_cover_image: boolean | null;
+  metadata: any | null;
+  payment_intent_id: string | null;
+  payment_status: string | null;
+  song_id: string;
+  user_id: string;
 }
