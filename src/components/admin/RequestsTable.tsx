@@ -39,16 +39,12 @@ const fetchOrdersWithDetails = async () => {
     .from('orders')
     .select(`
       *,
-      songs!fk_song (
+      songs (
         title,
         style,
         lyrics,
         themes,
-        reference_links,
-        cover_images!cover_images_song_id_fkey (
-          id,
-          file_path
-        )
+        reference_links
       ),
       order_songs (
         id,
@@ -58,6 +54,10 @@ const fetchOrdersWithDetails = async () => {
           id,
           file_path
         )
+      ),
+      profiles:user_id (
+        id,
+        email
       )
     `)
     .order('created_at', { ascending: false });
@@ -65,18 +65,7 @@ const fetchOrdersWithDetails = async () => {
   if (ordersError) throw ordersError;
 
   if (ordersData) {
-    const userIds = [...new Set(ordersData.map(order => order.user_id))];
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('id, email')
-      .in('id', userIds);
-
-    const ordersWithProfiles = ordersData.map(order => ({
-      ...order,
-      profiles: profiles?.find(profile => profile.id === order.user_id) || null
-    })) as Order[];
-
-    return ordersWithProfiles;
+    return ordersData as Order[];
   }
 
   return [];

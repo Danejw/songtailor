@@ -5,10 +5,10 @@ export interface Song {
   lyrics: string | null;
   themes: string | null;
   reference_links: string | null;
-  cover_images?: CoverImage[];
 }
 
 export interface Profile {
+  id: string;
   email: string | null;
 }
 
