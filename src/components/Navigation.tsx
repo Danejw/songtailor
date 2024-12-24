@@ -66,6 +66,11 @@ export const Navigation = () => {
             <Link to="/pricing" className="text-gray-600 hover:text-purple-600">
               Pricing
             </Link>
+            {isAuthenticated && (
+              <Link to="/dashboard" className="text-gray-600 hover:text-purple-600">
+                Dashboard
+              </Link>
+            )}
             <a href="#contact" className="text-gray-600 hover:text-purple-600">
               Contact
             </a>
@@ -104,6 +109,13 @@ export const Navigation = () => {
                     Pricing
                   </Link>
                 </DropdownMenuItem>
+                {isAuthenticated && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="w-full">
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                   <a href="#contact" className="w-full">
                     Contact
