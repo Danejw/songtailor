@@ -1,45 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+
+const fetchOrders = async () => {
+  const { data: orders, error } = await supabase
+    .from('orders')
+    .select('status');
+    
+  if (error) throw error;
+  return orders || [];
+};
 
 export function AdminStats() {
-  const [stats, setStats] = useState({
-    totalActive: 0,
-    pendingLyrics: 0,
-    completed: 0,
+  const { data: orders = [] } = useQuery({
+    queryKey: ['orders'],
+    queryFn: fetchOrders,
   });
 
-  useEffect(() => {
-    fetchStats();
-    subscribeToUpdates();
-  }, []);
-
-  const fetchStats = async () => {
-    const { data: orders } = await supabase
-      .from('orders')
-      .select('status');
-
-    if (orders) {
-      const active = orders.filter(order => order.status !== 'completed').length;
-      const pending = orders.filter(order => order.status === 'pending_lyrics_approval').length;
-      const completed = orders.filter(order => order.status === 'completed').length;
-
-      setStats({
-        totalActive: active,
-        pendingLyrics: pending,
-        completed: completed,
-      });
-    }
+  const stats = {
+    totalActive: orders.filter(order => order.status !== 'completed').length,
+    pendingLyrics: orders.filter(order => order.status === 'pending_lyrics_approval').length,
+    completed: orders.filter(order => order.status === 'completed').length,
   };
 
-  const subscribeToUpdates = () => {
+  useEffect(() => {
     const channel = supabase
       .channel('order-updates')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'orders' },
         () => {
-          fetchStats();
+          // React Query will handle the refetch
         }
       )
       .subscribe();
@@ -47,7 +39,7 @@ export function AdminStats() {
     return () => {
       supabase.removeChannel(channel);
     };
-  };
+  }, []);
 
   return (
     <div className="grid gap-4 md:grid-cols-3">

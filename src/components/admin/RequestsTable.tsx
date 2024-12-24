@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import {
   Table,
   TableBody,
@@ -14,55 +15,54 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { RequestDetailsDialog } from "./RequestDetailsDialog";
 
+const fetchOrdersWithDetails = async () => {
+  const { data, error } = await supabase
+    .from('orders')
+    .select(`
+      *,
+      songs (
+        title,
+        style,
+        lyrics,
+        themes,
+        reference_links
+      ),
+      profiles:user_id (
+        email
+      )
+    `)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+};
+
 export function RequestsTable() {
   const { toast } = useToast();
-  const [orders, setOrders] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  useEffect(() => {
-    fetchOrders();
-    subscribeToUpdates();
-  }, []);
-
-  const fetchOrders = async () => {
-    const { data, error } = await supabase
-      .from('orders')
-      .select(`
-        *,
-        songs (
-          title,
-          style,
-          lyrics,
-          themes,
-          reference_links
-        ),
-        profiles:user_id (
-          email
-        )
-      `)
-      .order('created_at', { ascending: false });
-
-    if (error) {
+  const { data: orders = [], refetch } = useQuery({
+    queryKey: ['orders-with-details'],
+    queryFn: fetchOrdersWithDetails,
+    onError: (error: any) => {
       toast({
         title: "Error fetching orders",
         description: error.message,
         variant: "destructive",
       });
-    } else {
-      setOrders(data || []);
-    }
-  };
+    },
+  });
 
-  const subscribeToUpdates = () => {
+  useEffect(() => {
     const channel = supabase
       .channel('admin-order-updates')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'orders' },
         () => {
-          fetchOrders();
+          refetch();
         }
       )
       .subscribe();
@@ -70,7 +70,7 @@ export function RequestsTable() {
     return () => {
       supabase.removeChannel(channel);
     };
-  };
+  }, [refetch]);
 
   const filteredOrders = orders.filter(order => {
     const searchLower = searchQuery.toLowerCase();
@@ -134,7 +134,7 @@ export function RequestsTable() {
         order={selectedOrder}
         open={isDetailsOpen}
         onOpenChange={setIsDetailsOpen}
-        onOrderUpdated={fetchOrders}
+        onOrderUpdated={refetch}
       />
     </div>
   );
