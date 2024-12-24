@@ -11,6 +11,11 @@ export interface Profile {
   email: string | null;  // Made email nullable to match database schema
 }
 
+export interface CoverImage {
+  id: string;
+  file_path: string;
+}
+
 export interface Order {
   id: string;
   created_at: string;
@@ -27,4 +32,5 @@ export interface Order {
   payment_status: string | null;
   song_id: string;
   user_id: string;
+  cover_images?: CoverImage[];
 }
