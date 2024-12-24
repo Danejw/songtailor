@@ -5,6 +5,7 @@ export interface Song {
   lyrics: string | null;
   themes: string | null;
   reference_links: string | null;
+  cover_images?: CoverImage[];  // Add this line
 }
 
 export interface Profile {
@@ -32,5 +33,4 @@ export interface Order {
   payment_status: string | null;
   song_id: string;
   user_id: string;
-  cover_images?: CoverImage[];
 }
