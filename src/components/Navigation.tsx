@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link } from "react-router-dom";
 import { Menu } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +13,37 @@ import {
 
 export const Navigation = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check initial auth state
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Signed out successfully",
+      });
+      navigate("/");
+    } catch (error) {
+      toast({
+        title: "Error signing out",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <nav className="bg-white/80 backdrop-blur-md fixed w-full z-50 shadow-sm">
@@ -35,9 +69,15 @@ export const Navigation = () => {
             <a href="#contact" className="text-gray-600 hover:text-purple-600">
               Contact
             </a>
-            <Button variant="outline" onClick={() => navigate("/login")}>
-              Sign In
-            </Button>
+            {isAuthenticated ? (
+              <Button variant="outline" onClick={handleSignOut}>
+                Sign Out
+              </Button>
+            ) : (
+              <Button variant="outline" onClick={() => navigate("/login")}>
+                Sign In
+              </Button>
+            )}
           </div>
 
           {/* Mobile Navigation */}
@@ -69,11 +109,17 @@ export const Navigation = () => {
                     Contact
                   </a>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/login" className="w-full">
-                    Sign In
-                  </Link>
-                </DropdownMenuItem>
+                {isAuthenticated ? (
+                  <DropdownMenuItem onClick={handleSignOut} className="w-full">
+                    Sign Out
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem asChild>
+                    <Link to="/login" className="w-full">
+                      Sign In
+                    </Link>
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

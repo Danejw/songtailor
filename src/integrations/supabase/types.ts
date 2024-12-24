@@ -391,9 +391,14 @@ export type Database = {
         Row: {
           amount: number
           created_at: string
+          delivery_status: string | null
+          final_song_url: string | null
           id: string
           includes_both_versions: boolean | null
           includes_cover_image: boolean | null
+          metadata: Json | null
+          payment_intent_id: string | null
+          payment_status: string | null
           song_id: string
           status: string
           user_id: string
@@ -401,9 +406,14 @@ export type Database = {
         Insert: {
           amount: number
           created_at?: string
+          delivery_status?: string | null
+          final_song_url?: string | null
           id?: string
           includes_both_versions?: boolean | null
           includes_cover_image?: boolean | null
+          metadata?: Json | null
+          payment_intent_id?: string | null
+          payment_status?: string | null
           song_id: string
           status?: string
           user_id: string
@@ -411,9 +421,14 @@ export type Database = {
         Update: {
           amount?: number
           created_at?: string
+          delivery_status?: string | null
+          final_song_url?: string | null
           id?: string
           includes_both_versions?: boolean | null
           includes_cover_image?: boolean | null
+          metadata?: Json | null
+          payment_intent_id?: string | null
+          payment_status?: string | null
           song_id?: string
           status?: string
           user_id?: string
@@ -434,6 +449,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       song_options: {
         Row: {
