@@ -38,7 +38,7 @@ const fetchOrdersWithDetails = async () => {
     .from('orders')
     .select(`
       *,
-      songs (
+      songs!fk_song (
         title,
         style,
         lyrics,
