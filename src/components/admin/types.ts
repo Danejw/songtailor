@@ -21,7 +21,7 @@ export interface OrderSong {
   id: string;
   song_url: string | null;
   is_primary: boolean;
-  cover_images?: CoverImage[] | null; // Updated to make it optional and nullable
+  cover_images: CoverImage | null; // Changed from CoverImage[] to single CoverImage
 }
 
 export interface Order {
@@ -39,5 +39,5 @@ export interface Order {
   payment_status: string | null;
   song_id: string;
   user_id: string;
-  order_songs?: OrderSong[] | null; // Updated to make it optional and nullable
+  order_songs: OrderSong[] | null;
 }

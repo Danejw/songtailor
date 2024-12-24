@@ -21,7 +21,6 @@ export function OrderUploadedFiles({
   }
 
   const getPublicUrl = (bucket: string, filePath: string) => {
-    // Extract just the filename from the full path
     const fileName = filePath.split('/').pop();
     if (!fileName) return '';
     
@@ -63,13 +62,13 @@ export function OrderUploadedFiles({
               </div>
             )}
             
-            {orderSong.cover_images?.map((cover) => (
-              <div key={cover.id} className="flex items-center gap-2 p-4 border rounded-lg">
+            {orderSong.cover_images && (
+              <div className="flex items-center gap-2 p-4 border rounded-lg">
                 <Image className="w-5 h-5 text-green-500" />
                 <div className="flex-1">
                   <p className="font-medium">Cover Image</p>
                   <img 
-                    src={getPublicUrl('covers', cover.file_path)} 
+                    src={getPublicUrl('covers', orderSong.cover_images.file_path)} 
                     alt="Cover" 
                     className="w-full h-40 object-cover rounded-lg mt-2"
                   />
@@ -77,13 +76,13 @@ export function OrderUploadedFiles({
                 <Button
                   variant="destructive"
                   size="icon"
-                  onClick={() => onDeleteCoverImage(cover, orderSong.id)}
+                  onClick={() => onDeleteCoverImage(orderSong.cover_images!, orderSong.id)}
                   disabled={isDeleting}
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
-            ))}
+            )}
           </div>
         </div>
       ))}

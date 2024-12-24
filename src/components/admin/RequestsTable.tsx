@@ -74,9 +74,9 @@ const fetchOrdersWithDetails = async (): Promise<Order[]> => {
     ...order,
     profiles: profiles?.find(profile => profile.id === order.user_id) || null,
     order_songs: order.order_songs || null
-  })) as Order[];
+  }));
 
-  return ordersWithProfiles;
+  return ordersWithProfiles as Order[];
 };
 
 export function RequestsTable() {
