@@ -32,5 +32,5 @@ export interface Order {
   payment_status: string | null;
   song_id: string;
   user_id: string;
-  cover_images?: CoverImage[];
+  cover_images: CoverImage[] | null;  // Made cover_images nullable
 }

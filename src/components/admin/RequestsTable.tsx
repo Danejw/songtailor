@@ -46,6 +46,10 @@ const fetchOrdersWithDetails = async () => {
         themes,
         reference_links
       ),
+      profiles (
+        id,
+        email
+      ),
       cover_images (
         id,
         file_path
@@ -56,18 +60,7 @@ const fetchOrdersWithDetails = async () => {
   if (ordersError) throw ordersError;
 
   if (ordersData) {
-    const userIds = [...new Set(ordersData.map(order => order.user_id))];
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('id, email')
-      .in('id', userIds);
-
-    const ordersWithProfiles = ordersData.map(order => ({
-      ...order,
-      profiles: profiles?.find(profile => profile.id === order.user_id) || null
-    }));
-
-    return ordersWithProfiles as Order[];
+    return ordersData as unknown as Order[];
   }
 
   return [];
