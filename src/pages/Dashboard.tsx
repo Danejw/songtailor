@@ -53,12 +53,12 @@ export default function Dashboard() {
         setProfile({ email: session.user.email });
       }
 
-      // Fetch orders with a single query
+      // Fetch orders with a single query, explicitly specifying the foreign key
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select(`
           *,
-          songs (
+          songs!orders_song_id_fkey (
             title,
             style,
             themes
