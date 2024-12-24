@@ -1,4 +1,5 @@
 export interface Song {
+  id?: string;
   title: string | null;
   style: string | null;
   lyrics: string | null;

@@ -108,7 +108,10 @@ export function RequestDetailsDialog({
             onStatusChange={setStatus}
           />
           
-          <OrderSongInfo song={order.songs} />
+          <OrderSongInfo 
+            song={order.songs} 
+            onSongUpdated={onOrderUpdated}
+          />
           
           <OrderFileUploads
             includesCoverImage={order.includes_cover_image || false}
