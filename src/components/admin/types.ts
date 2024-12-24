@@ -28,8 +28,8 @@ export interface Order {
   id: string;
   created_at: string;
   status: string;
-  songs?: Song | null;
-  profiles?: Profile | null;
+  songs: Song | null;
+  profiles: Profile | null;
   amount: number;
   delivery_status: string | null;
   includes_both_versions: boolean | null;

@@ -35,6 +35,12 @@ const fetchOrdersWithDetails = async () => {
     }
   }
 
+  // First, get the user profiles
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, email');
+
+  // Then fetch orders with related data
   const { data: ordersData, error: ordersError } = await supabase
     .from('orders')
     .select(`
@@ -54,10 +60,6 @@ const fetchOrdersWithDetails = async () => {
           id,
           file_path
         )
-      ),
-      profiles (
-        id,
-        email
       )
     `)
     .order('created_at', { ascending: false });
@@ -67,7 +69,16 @@ const fetchOrdersWithDetails = async () => {
     throw ordersError;
   }
 
-  return ordersData as Order[];
+  // Manually join the profiles data with orders
+  const ordersWithProfiles = ordersData?.map(order => {
+    const userProfile = profiles?.find(profile => profile.id === order.user_id);
+    return {
+      ...order,
+      profiles: userProfile || null
+    };
+  });
+
+  return ordersWithProfiles as Order[];
 };
 
 export function RequestsTable() {
