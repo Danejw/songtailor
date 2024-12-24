@@ -19,8 +19,6 @@ const Login = () => {
         navigate(returnTo);
       } else if (event === 'INITIAL_SESSION') {
         if (session) navigate(returnTo);
-      } else if (event === 'SIGNED_OUT' || event === 'PASSWORD_RECOVERY') {
-        setError(null);
       }
     });
 
@@ -51,15 +49,7 @@ const Login = () => {
                 appearance={{ theme: ThemeSupa }}
                 theme="light"
                 providers={[]}
-                onError={(error) => {
-                  if (error.message.includes('email_not_confirmed')) {
-                    setError("Please check your email and click the confirmation link before signing in.");
-                  } else if (error.message.includes('Invalid login credentials')) {
-                    setError("Invalid email or password. Please try again.");
-                  } else {
-                    setError("An error occurred during authentication. Please try again.");
-                  }
-                }}
+                view="sign_in"
               />
             </CardContent>
           </Card>
