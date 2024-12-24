@@ -33,9 +33,6 @@ export const OrdersList: FC<OrdersListProps> = ({ orders, type }) => {
             </div>
             <div className="flex gap-2 mt-2">
               <Badge>{order.status}</Badge>
-              {order.includes_cover_image && (
-                <Badge variant="outline">Cover Image</Badge>
-              )}
               {order.includes_both_versions && (
                 <Badge variant="outline">Two Versions</Badge>
               )}

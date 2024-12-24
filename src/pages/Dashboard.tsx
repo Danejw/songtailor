@@ -55,7 +55,7 @@ export default function Dashboard() {
         setProfile({ email: session.user.email });
       }
 
-      // Fetch orders with nested songs and their cover images
+      // Fetch orders with nested songs, removing cover_images for now
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select(`
@@ -63,10 +63,7 @@ export default function Dashboard() {
           songs!orders_song_id_fkey (
             title,
             style,
-            themes,
-            cover_images (
-              file_path
-            )
+            themes
           )
         `)
         .eq('user_id', session.user.id)
