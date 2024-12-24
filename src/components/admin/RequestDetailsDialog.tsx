@@ -163,6 +163,7 @@ export function RequestDetailsDialog({
         .insert({
           order_song_id: orderSongId,
           file_path: filePath,
+          song_id: order.song_id // Add the required song_id field
         });
 
       if (error) {

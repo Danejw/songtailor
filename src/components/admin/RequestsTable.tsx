@@ -49,6 +49,15 @@ const fetchOrdersWithDetails = async () => {
           id,
           file_path
         )
+      ),
+      order_songs (
+        id,
+        song_url,
+        is_primary,
+        cover_images (
+          id,
+          file_path
+        )
       )
     `)
     .order('created_at', { ascending: false });
@@ -65,9 +74,9 @@ const fetchOrdersWithDetails = async () => {
     const ordersWithProfiles = ordersData.map(order => ({
       ...order,
       profiles: profiles?.find(profile => profile.id === order.user_id) || null
-    }));
+    })) as Order[];
 
-    return ordersWithProfiles as Order[];
+    return ordersWithProfiles;
   }
 
   return [];
