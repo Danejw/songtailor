@@ -16,18 +16,37 @@ import { format } from "date-fns";
 import { RequestDetailsDialog } from "./RequestDetailsDialog";
 
 const fetchOrdersWithDetails = async () => {
+  // First fetch profiles to ensure they exist
+  const { data: session } = await supabase.auth.getSession();
+  if (session?.user) {
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select()
+      .eq('id', session.user.id)
+      .single();
+
+    if (!profile) {
+      // Create profile if it doesn't exist
+      await supabase.from('profiles').insert({
+        id: session.user.id,
+        email: session.user.email
+      });
+    }
+  }
+
+  // Now fetch orders with related data
   const { data, error } = await supabase
     .from('orders')
     .select(`
       *,
-      songs!orders_song_id_fkey (
+      songs (
         title,
         style,
         lyrics,
         themes,
         reference_links
       ),
-      user:profiles!inner(
+      profiles!orders_user_id_fkey (
         email
       )
     `)
@@ -73,7 +92,7 @@ export function RequestsTable() {
     return (
       order.id.toLowerCase().includes(searchLower) ||
       order.songs?.title?.toLowerCase().includes(searchLower) ||
-      order.user?.email?.toLowerCase().includes(searchLower)
+      order.profiles?.email?.toLowerCase().includes(searchLower)
     );
   });
 
@@ -104,7 +123,7 @@ export function RequestsTable() {
             {filteredOrders.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="font-medium">{order.id.slice(0, 8)}</TableCell>
-                <TableCell>{order.user?.email}</TableCell>
+                <TableCell>{order.profiles?.email}</TableCell>
                 <TableCell>{order.songs?.title || "Untitled"}</TableCell>
                 <TableCell>{order.status}</TableCell>
                 <TableCell>{format(new Date(order.created_at), "MMM d, yyyy")}</TableCell>
