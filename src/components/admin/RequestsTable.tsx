@@ -13,9 +13,9 @@ import { OrderSearchInput } from "./OrderSearchInput";
 import { OrderStatusFilter } from "./OrderStatusFilter";
 import { OrderTableRow } from "./OrderTableRow";
 import { RequestDetailsDialog } from "./RequestDetailsDialog";
-import type { Order } from "./types";
+import type { Order, Profile } from "./types";
 
-const fetchOrdersWithDetails = async () => {
+const fetchOrdersWithDetails = async (): Promise<Order[]> => {
   const { data: sessionData } = await supabase.auth.getSession();
   const session = sessionData?.session;
   
@@ -69,16 +69,14 @@ const fetchOrdersWithDetails = async () => {
     throw ordersError;
   }
 
-  // Manually join the profiles data with orders
-  const ordersWithProfiles = ordersData?.map(order => {
-    const userProfile = profiles?.find(profile => profile.id === order.user_id);
-    return {
-      ...order,
-      profiles: userProfile || null
-    };
-  });
+  // Manually join the profiles data with orders and ensure type safety
+  const ordersWithProfiles = ordersData?.map(order => ({
+    ...order,
+    profiles: profiles?.find(profile => profile.id === order.user_id) || null,
+    order_songs: order.order_songs || null
+  })) as Order[];
 
-  return ordersWithProfiles as Order[];
+  return ordersWithProfiles;
 };
 
 export function RequestsTable() {
