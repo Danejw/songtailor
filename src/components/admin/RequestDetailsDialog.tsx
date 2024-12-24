@@ -6,7 +6,7 @@ import {
   DialogContent,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AudioWaveform, Image } from "lucide-react";
+import { AudioWaveform, Image, Trash2 } from "lucide-react";
 import { OrderDetailsHeader } from "./OrderDetailsHeader";
 import { OrderUserInfo } from "./OrderUserInfo";
 import { OrderSongInfo } from "./OrderSongInfo";
@@ -29,6 +29,7 @@ export function RequestDetailsDialog({
   const { toast } = useToast();
   const [status, setStatus] = useState(order?.status || "pending");
   const [isUploading, setIsUploading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   if (!order) return null;
 
@@ -49,6 +50,84 @@ export function RequestDetailsDialog({
         title: "Status updated successfully",
       });
       onOrderUpdated();
+    }
+  };
+
+  const handleDeleteAudio = async () => {
+    if (!order.final_song_url) return;
+    
+    setIsDeleting(true);
+    try {
+      // Extract filename from URL
+      const fileName = order.final_song_url.split('/').pop();
+      if (!fileName) throw new Error("Invalid file URL");
+
+      // Delete from storage
+      const { error: storageError } = await supabase.storage
+        .from('songs')
+        .remove([fileName]);
+
+      if (storageError) throw storageError;
+
+      // Update order record
+      const { error: dbError } = await supabase
+        .from('orders')
+        .update({ final_song_url: null })
+        .eq('id', order.id);
+
+      if (dbError) throw dbError;
+
+      toast({
+        title: "Audio file deleted successfully",
+      });
+      
+      onOrderUpdated();
+    } catch (error: any) {
+      toast({
+        title: "Error deleting audio file",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteCoverImage = async (coverImage: { id: string, file_path: string }) => {
+    setIsDeleting(true);
+    try {
+      // Extract filename from URL
+      const fileName = coverImage.file_path.split('/').pop();
+      if (!fileName) throw new Error("Invalid file URL");
+
+      // Delete from storage
+      const { error: storageError } = await supabase.storage
+        .from('covers')
+        .remove([fileName]);
+
+      if (storageError) throw storageError;
+
+      // Delete from database
+      const { error: dbError } = await supabase
+        .from('cover_images')
+        .delete()
+        .eq('id', coverImage.id);
+
+      if (dbError) throw dbError;
+
+      toast({
+        title: "Cover image deleted successfully",
+      });
+      
+      onOrderUpdated();
+    } catch (error: any) {
+      toast({
+        title: "Error deleting cover image",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -129,6 +208,14 @@ export function RequestDetailsDialog({
                         Your browser does not support the audio element.
                       </audio>
                     </div>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={handleDeleteAudio}
+                      disabled={isDeleting}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 )}
                 
@@ -143,6 +230,14 @@ export function RequestDetailsDialog({
                         className="w-full h-40 object-cover rounded-lg mt-2"
                       />
                     </div>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => handleDeleteCoverImage(cover)}
+                      disabled={isDeleting}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -165,7 +260,7 @@ export function RequestDetailsDialog({
             </Button>
             <Button
               onClick={handleStatusUpdate}
-              disabled={isUploading}
+              disabled={isUploading || isDeleting}
             >
               Update Status
             </Button>
