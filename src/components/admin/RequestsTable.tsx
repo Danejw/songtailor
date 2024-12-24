@@ -5,39 +5,35 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
+import { OrderSearchInput } from "./OrderSearchInput";
+import { OrderTableRow } from "./OrderTableRow";
 import { RequestDetailsDialog } from "./RequestDetailsDialog";
+import type { Order } from "./types";
 
 const fetchOrdersWithDetails = async () => {
-  // First fetch profiles to ensure they exist
   const { data: sessionData } = await supabase.auth.getSession();
   const session = sessionData?.session;
   
   if (session?.user?.id) {
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile } = await supabase
       .from('profiles')
       .select()
       .eq('id', session.user.id)
       .single();
 
     if (!profile) {
-      // Create profile if it doesn't exist
       await supabase.from('profiles').insert({
         id: session.user.id,
         email: session.user.email,
-        is_admin: true // Since this is the admin dashboard
+        is_admin: true
       });
     }
   }
 
-  // Now fetch orders with related data
   const { data, error } = await supabase
     .from('orders')
     .select(`
@@ -56,13 +52,13 @@ const fetchOrdersWithDetails = async () => {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data || [];
+  return data as Order[];
 };
 
 export function RequestsTable() {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   const { data: orders = [], refetch } = useQuery({
@@ -99,14 +95,17 @@ export function RequestsTable() {
     );
   });
 
+  const handleViewDetails = (order: Order) => {
+    setSelectedOrder(order);
+    setIsDetailsOpen(true);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <Input
-          placeholder="Search orders..."
+        <OrderSearchInput 
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="max-w-sm"
+          onChange={setSearchQuery}
         />
       </div>
 
@@ -124,25 +123,11 @@ export function RequestsTable() {
           </TableHeader>
           <TableBody>
             {filteredOrders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell className="font-medium">{order.id.slice(0, 8)}</TableCell>
-                <TableCell>{order.profiles?.email || 'N/A'}</TableCell>
-                <TableCell>{order.songs?.title || "Untitled"}</TableCell>
-                <TableCell>{order.status}</TableCell>
-                <TableCell>{format(new Date(order.created_at), "MMM d, yyyy")}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedOrder(order);
-                      setIsDetailsOpen(true);
-                    }}
-                  >
-                    View Details
-                  </Button>
-                </TableCell>
-              </TableRow>
+              <OrderTableRow
+                key={order.id}
+                order={order}
+                onViewDetails={handleViewDetails}
+              />
             ))}
           </TableBody>
         </Table>
