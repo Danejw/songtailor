@@ -113,15 +113,62 @@ export function SongPurchaseForm() {
         return;
       }
 
-      // Here we would typically handle the form submission
+      // Create a new song entry
+      const { data: songData, error: songError } = await supabase
+        .from('songs')
+        .insert([
+          {
+            user_id: session.user.id,
+            title: data.songTitle || 'Untitled Song',
+            style: data.musicStyle === 'Other' ? data.otherMusicStyle : data.musicStyle,
+            lyrics: data.lyrics,
+            themes: data.theme || '',
+            reference_links: data.references,
+            status: 'pending'
+          }
+        ])
+        .select()
+        .single();
+
+      if (songError) throw songError;
+
+      // Calculate total amount
+      const totalAmount = basePrice + 
+        (data.wantCoverImage ? 5 : 0) + 
+        (data.wantSecondSong ? 15 : 0) + 
+        (data.wantSecondCoverImage ? 5 : 0);
+
+      // Create an order
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .insert([
+          {
+            song_id: songData.id,
+            user_id: session.user.id,
+            amount: totalAmount,
+            includes_both_versions: data.wantSecondSong,
+            includes_cover_image: data.wantCoverImage,
+            status: 'completed', // Mocking successful payment
+            payment_status: 'succeeded', // Mocking successful payment
+            metadata: {
+              formData: data
+            }
+          }
+        ])
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
       toast({
-        title: "Order submitted successfully!",
-        description: "Redirecting to payment...",
+        title: "Order placed successfully!",
+        description: "Your song request has been received.",
       });
       
-      // Redirect to payment page (to be implemented)
-      setTimeout(() => navigate("/payment"), 1500);
+      // Redirect to a success page or dashboard
+      navigate("/dashboard");
     } catch (error) {
+      console.error('Error:', error);
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
