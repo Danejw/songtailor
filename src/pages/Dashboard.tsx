@@ -32,11 +32,13 @@ export default function Dashboard() {
         description: "You need to be logged in to view your dashboard",
       });
       navigate("/login", { state: { returnTo: "/dashboard" } });
+      return;
     }
   };
 
   const fetchDashboardData = async () => {
     try {
+      setIsLoading(true);
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
@@ -53,7 +55,7 @@ export default function Dashboard() {
         setProfile({ email: session.user.email });
       }
 
-      // Fetch orders with a single query, explicitly specifying the foreign key
+      // Fetch orders with explicit foreign key relationships
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select(`
@@ -63,7 +65,7 @@ export default function Dashboard() {
             style,
             themes
           ),
-          cover_images (
+          cover_images!cover_images_song_id_fkey (
             file_path
           )
         `)
@@ -78,11 +80,11 @@ export default function Dashboard() {
           variant: "destructive",
         });
       } else if (ordersData) {
-        setActiveOrders(ordersData.filter(order => order.status !== 'completed'));
-        setCompletedOrders(ordersData.filter(order => order.status === 'completed'));
+        const active = ordersData.filter(order => order.status !== 'completed');
+        const completed = ordersData.filter(order => order.status === 'completed');
+        setActiveOrders(active);
+        setCompletedOrders(completed);
       }
-
-      setIsLoading(false);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       toast({
@@ -90,6 +92,7 @@ export default function Dashboard() {
         description: "Failed to load dashboard data",
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
     }
   };
