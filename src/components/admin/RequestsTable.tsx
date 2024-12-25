@@ -40,7 +40,7 @@ const fetchOrdersWithDetails = async (): Promise<Order[]> => {
     .from('profiles')
     .select('id, email');
 
-  // Then fetch orders with related data
+  // Then fetch orders with related data, including the proper joins
   const { data: ordersData, error: ordersError } = await supabase
     .from('orders')
     .select(`
@@ -56,7 +56,7 @@ const fetchOrdersWithDetails = async (): Promise<Order[]> => {
         id,
         song_url,
         is_primary,
-        cover_images (
+        cover_images!cover_images_order_song_id_fkey (
           id,
           file_path
         )
