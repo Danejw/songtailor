@@ -165,7 +165,7 @@ export default function Dashboard() {
           </div>
 
           <div className="space-y-6">
-            <NotificationsPanel userId={profile?.id} />
+            {/* Removed NotificationsPanel as per request */}
             
             <Card>
               <CardHeader>
