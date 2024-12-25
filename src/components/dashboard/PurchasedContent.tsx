@@ -16,13 +16,10 @@ export function PurchasedContent() {
           songs!fk_song (
             title,
             style,
-            themes,
-            lyrics,
-            reference_links
+            themes
           ),
           order_songs (
             id,
-            order_id,
             song_url,
             is_primary,
             cover_images (
@@ -83,14 +80,14 @@ export function PurchasedContent() {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {orders?.map((order) => (
+          {orders.map((order) => (
             <div 
               key={order.id} 
               className="group space-y-3"
             >
               <div className="space-y-1">
                 <h3 className="font-medium text-sm text-primary/90 group-hover:text-primary truncate">
-                  {order.metadata?.formData?.songTitle || order.songs?.title || "Untitled Song"}
+                  {order.songs?.title || "Untitled Song"}
                 </h3>
                 <p className="text-xs text-muted-foreground/80 truncate">
                   {order.songs?.style} • {order.songs?.themes}

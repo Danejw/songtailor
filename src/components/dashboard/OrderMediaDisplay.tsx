@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { FileUrlManager } from "@/components/admin/files/FileUrlManager";
-import { useToast } from "@/hooks/use-toast";
 import { useAudio } from "@/components/audio/AudioContext";
 import type { OrderSong } from "@/components/admin/types";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,7 +11,6 @@ interface OrderMediaDisplayProps {
 }
 
 export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
-  const { toast } = useToast();
   const { currentTrack, isPlaying, playTrack, pauseTrack } = useAudio();
   const [audioUrl, setAudioUrl] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
@@ -32,37 +30,30 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
           setImageUrl(url);
         }
 
-        // Only fetch order data if we have an order_id
+        // Fetch order metadata to get song title
         if (orderSong.order_id) {
-          const { data: orderData, error: orderError } = await supabase
+          const { data: orderData, error } = await supabase
             .from('orders')
             .select('metadata')
             .eq('id', orderSong.order_id)
             .maybeSingle();
 
-          if (orderError) throw orderError;
-
-          // Safely extract song title from metadata
-          const formData = orderData?.metadata?.formData;
-          if (formData && typeof formData === 'object' && 'songTitle' in formData) {
-            setSongTitle(formData.songTitle || "Untitled Song");
+          if (error) {
+            console.error('Error fetching order metadata:', error);
+          } else if (orderData?.metadata?.formData?.songTitle) {
+            setSongTitle(orderData.metadata.formData.songTitle);
           }
         }
 
       } catch (error) {
         console.error('Error loading media URLs:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load media files",
-          variant: "destructive",
-        });
       } finally {
         setIsLoading(false);
       }
     };
 
     loadUrls();
-  }, [orderSong, toast]);
+  }, [orderSong]);
 
   const isCurrentlyPlaying = currentTrack?.url === audioUrl && isPlaying;
 

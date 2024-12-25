@@ -18,30 +18,23 @@ export interface CoverImage {
   file_path: string;
 }
 
+export interface OrderFormData {
+  songTitle?: string;
+  // ... other form data fields can be added here
+}
+
+export interface OrderMetadata {
+  formData?: OrderFormData;
+  // ... other metadata fields can be added here
+}
+
 export interface OrderSong {
   id: string;
-  order_id: string | null;
   song_url: string | null;
   is_primary: boolean;
   cover_images: CoverImage | null;
-}
-
-export interface OrderFormData {
-  name: string;
-  email: string;
-  phone?: string;
-  songTitle?: string;
-  provideLyrics: "yes" | "no";
-  lyrics?: string;
-  theme?: string;
-  musicStyle: string;
-  otherMusicStyle?: string;
-  mood: string;
-  otherMood?: string;
-  references?: string;
-  wantCoverImage: boolean;
-  wantSecondSong: boolean;
-  wantSecondCoverImage?: boolean;
+  metadata?: { songTitle?: string } | null;
+  order_id?: string;
 }
 
 export interface Order {
@@ -54,9 +47,7 @@ export interface Order {
   delivery_status: string | null;
   includes_both_versions: boolean | null;
   includes_cover_image: boolean | null;
-  metadata: {
-    formData: OrderFormData;
-  } | null;
+  metadata: OrderMetadata | null;
   payment_intent_id: string | null;
   payment_status: string | null;
   song_id: string;
