@@ -4,7 +4,7 @@ import { PublicSongCard } from "@/components/public/PublicSongCard";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Music, Loader2 } from "lucide-react";
-import type { OrderSong, Order } from "@/components/admin/types";
+import type { OrderSong } from "@/components/admin/types";
 
 const PublicSongs = () => {
   const { data: publicSongs, isLoading } = useQuery({
@@ -16,22 +16,24 @@ const PublicSongs = () => {
           *,
           cover_images (
             file_path
-          ),
-          orders (
-            metadata,
-            songs (
-              title
-            )
           )
         `)
         .eq('is_public', true);
 
       if (error) throw error;
-      return data as (OrderSong & {
-        orders: Order & { songs: { title: string } };
-      })[];
+      return data as OrderSong[];
     },
   });
+
+  const getSongTitle = (songUrl: string | null) => {
+    if (!songUrl) return "Untitled Song";
+    // Extract filename without extension
+    const fileName = songUrl.split('/').pop()?.split('.')[0] || "Untitled Song";
+    // Convert underscores/dashes to spaces and capitalize words
+    return fileName
+      .replace(/[_-]/g, ' ')
+      .replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#9b87f5]/10 via-white to-[#7E69AB]/10">
@@ -74,11 +76,7 @@ const PublicSongs = () => {
               <PublicSongCard
                 key={song.id}
                 song={song}
-                title={
-                  song.orders?.metadata?.formData?.songTitle ||
-                  song.orders?.songs?.title ||
-                  "Untitled Song"
-                }
+                title={getSongTitle(song.song_url)}
               />
             ))}
           </div>
