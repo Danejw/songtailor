@@ -18,7 +18,7 @@ const PublicSongs = () => {
           ),
           orders (
             metadata,
-            songs (
+            songs:song_id (
               title
             )
           )
@@ -68,7 +68,8 @@ const PublicSongs = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
             {publicSongs.map((song) => {
-              const songTitle = song.orders?.metadata?.formData?.songTitle || 
+              const metadata = song.orders?.metadata as { formData?: OrderFormData } | null;
+              const songTitle = metadata?.formData?.songTitle || 
                               song.orders?.songs?.title || 
                               "Untitled Song";
               
