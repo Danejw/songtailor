@@ -74,44 +74,25 @@ export function GlobalAudioPlayer() {
   if (!currentTrack) return null;
 
   return (
-    <Card className="fixed bottom-0 left-0 right-0 p-3 bg-white/80 backdrop-blur-lg border-t z-50">
-      <div className="container mx-auto flex items-center gap-6">
-        {/* Left section: Title and primary controls */}
-        <div className="flex items-center gap-4 min-w-[240px] max-w-[320px]">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => isPlaying ? pauseTrack() : playTrack(currentTrack.url, currentTrack.title)}
-            className="h-10 w-10 shrink-0 hover:bg-secondary/80"
-          >
-            {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-          </Button>
-          <div className="min-w-0">
-            <p className="text-sm font-medium truncate">{currentTrack.title}</p>
-          </div>
-        </div>
-
-        {/* Center section: Progress and additional controls */}
-        <div className="flex-1 flex flex-col gap-1">
-          <div className="flex items-center justify-center gap-3">
+    <Card className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-lg border-t z-50">
+      <div className="container mx-auto flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4 flex-1">
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
               onClick={handleSkipBack}
               title="Skip back 10 seconds"
-              className="h-8 w-8 hover:bg-secondary/80"
             >
-              <SkipBack className="h-4 w-4" />
+              <SkipBack className="h-5 w-5" />
             </Button>
             
             <Button
               variant="ghost"
               size="icon"
-              onClick={toggleLoop}
-              className={`h-8 w-8 hover:bg-secondary/80 ${isLooping ? "text-primary" : ""}`}
-              title="Toggle loop"
+              onClick={() => isPlaying ? pauseTrack() : playTrack(currentTrack.url, currentTrack.title)}
             >
-              <Repeat className="h-4 w-4" />
+              {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
             </Button>
 
             <Button
@@ -119,36 +100,49 @@ export function GlobalAudioPlayer() {
               size="icon"
               onClick={handleSkipForward}
               title="Skip forward 10 seconds"
-              className="h-8 w-8 hover:bg-secondary/80"
             >
-              <SkipForward className="h-4 w-4" />
+              <SkipForward className="h-5 w-5" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleLoop}
+              className={isLooping ? "text-primary" : ""}
+              title="Toggle loop"
+            >
+              <Repeat className="h-5 w-5" />
             </Button>
           </div>
-
-          <div className="flex items-center gap-2 px-2">
-            <span className="text-xs text-muted-foreground w-10 text-right">
-              {formatTime(currentTime)}
-            </span>
-            <Slider
-              className="flex-1"
-              value={[currentTime]}
-              min={0}
-              max={duration || 100}
-              step={1}
-              onValueChange={handleTimeChange}
+          
+          <div className="flex-1 space-y-1">
+            <p className="text-sm font-medium truncate">{currentTrack.title}</p>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">{formatTime(currentTime)}</span>
+              <Slider
+                className="flex-1"
+                value={[currentTime]}
+                min={0}
+                max={duration || 100}
+                step={1}
+                onValueChange={handleTimeChange}
+              />
+              <span className="text-xs text-muted-foreground">{formatTime(duration)}</span>
+            </div>
+            <audio
+              ref={audioRef}
+              src={currentTrack.url}
+              onEnded={() => stopTrack()}
+              className="hidden"
             />
-            <span className="text-xs text-muted-foreground w-10">
-              {formatTime(duration)}
-            </span>
           </div>
         </div>
 
-        {/* Right section: Volume and Close */}
-        <div className="flex items-center gap-3 min-w-[180px] justify-end">
+        <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Volume2 className="h-4 w-4 text-muted-foreground" />
             <Slider
-              className="w-20"
+              className="w-24"
               value={[volume]}
               min={0}
               max={1}
@@ -166,19 +160,11 @@ export function GlobalAudioPlayer() {
             variant="ghost"
             size="icon"
             onClick={stopTrack}
-            className="h-8 w-8 hover:bg-secondary/80"
           >
             <X className="h-4 w-4" />
           </Button>
         </div>
       </div>
-
-      <audio
-        ref={audioRef}
-        src={currentTrack.url}
-        onEnded={() => stopTrack()}
-        className="hidden"
-      />
     </Card>
   );
 }
