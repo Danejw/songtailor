@@ -87,7 +87,7 @@ export function GlobalAudioPlayer() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => isPlaying ? pauseTrack() : playTrack(currentTrack.url, currentTrack.title)}
+                onClick={() => isPlaying ? pauseTrack() : playTrack(currentTrack.url, currentTrack.title, currentTrack.songId)}
                 className="h-10 w-10"
               >
                 {isPlaying ? 
@@ -97,7 +97,6 @@ export function GlobalAudioPlayer() {
               </Button>
               <div>
                 <h3 className="font-medium text-sm">{currentTrack.title}</h3>
-                <p className="text-xs text-muted-foreground">Singer feat Singer</p>
               </div>
             </div>
             <div className="w-1/3">
@@ -113,10 +112,9 @@ export function GlobalAudioPlayer() {
           </div>
         ) : (
           <div className="space-y-4">
-            {/* Title and Artist */}
+            {/* Title */}
             <div className="text-center">
               <h3 className="font-medium text-lg">{currentTrack.title}</h3>
-              <p className="text-sm text-muted-foreground">Singer feat Singer</p>
             </div>
 
             {/* Progress Bar */}
@@ -149,7 +147,7 @@ export function GlobalAudioPlayer() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => isPlaying ? pauseTrack() : playTrack(currentTrack.url, currentTrack.title)}
+                onClick={() => isPlaying ? pauseTrack() : playTrack(currentTrack.url, currentTrack.title, currentTrack.songId)}
                 className="h-14 w-14 bg-black text-white hover:bg-black/90 rounded-full"
               >
                 {isPlaying ? 

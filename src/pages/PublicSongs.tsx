@@ -15,12 +15,6 @@ const PublicSongs = () => {
           *,
           cover_images (
             file_path
-          ),
-          orders (
-            metadata,
-            songs:song_id (
-              title
-            )
           )
         `)
         .eq('is_public', true);
@@ -34,6 +28,7 @@ const PublicSongs = () => {
     <div className="min-h-screen bg-gradient-to-br from-[#9b87f5]/10 via-white to-[#7E69AB]/10">
       <Navigation />
       
+      {/* Enhanced hero section with animated gradient and pattern */}
       <div className="relative py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/60 to-transparent animate-gradient" />
         <div className="absolute inset-0 grid-pattern opacity-10" />
@@ -67,20 +62,9 @@ const PublicSongs = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
-            {publicSongs.map((song) => {
-              const metadata = song.orders?.metadata as { formData?: OrderFormData } | null;
-              const songTitle = metadata?.formData?.songTitle || 
-                              song.orders?.songs?.title || 
-                              "Untitled Song";
-              
-              return (
-                <PublicSongCard 
-                  key={song.id} 
-                  song={song}
-                  title={songTitle}
-                />
-              );
-            })}
+            {publicSongs.map((song) => (
+              <PublicSongCard key={song.id} song={song} />
+            ))}
           </div>
         )}
       </main>
