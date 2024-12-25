@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { AudioWaveform, Image, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +33,8 @@ export function OrderUploadedFiles({
   const [deleteCoverImage, setDeleteCoverImage] = useState<{ image: { id: string, file_path: string }, orderSongId: string } | null>(null);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [failedAudio, setFailedAudio] = useState<Set<string>>(new Set());
+  const [audioUrls, setAudioUrls] = useState<Record<string, string>>({});
+  const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
 
   if (!order.order_songs?.length) {
     return null;
@@ -41,13 +43,34 @@ export function OrderUploadedFiles({
   const getPublicUrl = async (bucket: string, filePath: string) => {
     if (!filePath) return '';
     
-    // Get the file path directly from the database
     const { data } = await supabase.storage
       .from(bucket)
       .createSignedUrl(filePath, 3600); // 1 hour expiration
 
     return data?.signedUrl || '';
   };
+
+  useEffect(() => {
+    const loadUrls = async () => {
+      // Load audio URLs
+      for (const orderSong of order.order_songs || []) {
+        if (orderSong.song_url && !audioUrls[orderSong.song_url]) {
+          const url = await getPublicUrl('songs', orderSong.song_url);
+          setAudioUrls(prev => ({ ...prev, [orderSong.song_url!]: url }));
+        }
+      }
+
+      // Load image URLs
+      for (const orderSong of order.order_songs || []) {
+        if (orderSong.cover_images?.file_path && !imageUrls[orderSong.cover_images.file_path]) {
+          const url = await getPublicUrl('covers', orderSong.cover_images.file_path);
+          setImageUrls(prev => ({ ...prev, [orderSong.cover_images!.file_path]: url }));
+        }
+      }
+    };
+
+    loadUrls();
+  }, [order.order_songs]);
 
   const handleImageError = (filePath: string) => {
     setFailedImages(prev => new Set([...prev, filePath]));
@@ -101,10 +124,10 @@ export function OrderUploadedFiles({
                       controls 
                       className="w-full mt-2"
                       onError={() => handleAudioError(orderSong.song_url!)}
-                      key={orderSong.song_url} // Add key to force re-render when URL changes
+                      key={`${orderSong.song_url}-${audioUrls[orderSong.song_url]}`}
                     >
                       <source 
-                        src={getPublicUrl('songs', orderSong.song_url)} 
+                        src={audioUrls[orderSong.song_url]} 
                         type="audio/mpeg" 
                       />
                       Your browser does not support the audio element.
@@ -127,7 +150,7 @@ export function OrderUploadedFiles({
                   <div className="flex-1">
                     <p className="font-medium">Cover Image</p>
                     <img 
-                      src={getPublicUrl('covers', orderSong.cover_images.file_path)} 
+                      src={imageUrls[orderSong.cover_images.file_path]} 
                       alt="Cover" 
                       className="w-full h-40 object-cover rounded-lg mt-2"
                       onError={() => handleImageError(orderSong.cover_images!.file_path)}
