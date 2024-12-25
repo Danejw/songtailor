@@ -1,21 +1,23 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { FileUrlManager } from "@/components/admin/files/FileUrlManager";
+import { useToast } from "@/hooks/use-toast";
 import { useAudio } from "@/components/audio/AudioContext";
 import type { OrderSong } from "@/components/admin/types";
 import { supabase } from "@/integrations/supabase/client";
-import { Play, Pause, Download, Image } from "lucide-react";
+import { Play, Pause, Download, Image } from "lucide-react"; // Added missing imports
 
 interface OrderMediaDisplayProps {
   orderSong: OrderSong;
 }
 
 export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
+  const { toast } = useToast();
   const { currentTrack, isPlaying, playTrack, pauseTrack } = useAudio();
   const [audioUrl, setAudioUrl] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
-  const [songTitle, setSongTitle] = useState<string>("Untitled Song");
+  const [songTitle, setSongTitle] = useState<string>("");
 
   useEffect(() => {
     const loadUrls = async () => {
@@ -30,30 +32,30 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
           setImageUrl(url);
         }
 
-        // Fetch order metadata to get song title
-        if (orderSong.order_id) {
-          const { data: orderData, error } = await supabase
-            .from('orders')
-            .select('metadata')
-            .eq('id', orderSong.order_id)
-            .maybeSingle();
+        // Fetch the song title from orders and songs tables
+        const { data: orderData, error: orderError } = await supabase
+          .from('orders')
+          .select('songs(title)')
+          .eq('id', orderSong.order_id)
+          .single();
 
-          if (error) {
-            console.error('Error fetching order metadata:', error);
-          } else if (orderData?.metadata?.formData?.songTitle) {
-            setSongTitle(orderData.metadata.formData.songTitle);
-          }
-        }
+        if (orderError) throw orderError;
+        setSongTitle(orderData?.songs?.title || `Song ${orderSong.id}`);
 
       } catch (error) {
         console.error('Error loading media URLs:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load media files",
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
     };
 
     loadUrls();
-  }, [orderSong]);
+  }, [orderSong, toast]);
 
   const isCurrentlyPlaying = currentTrack?.url === audioUrl && isPlaying;
 
