@@ -18,6 +18,16 @@ export interface CoverImage {
   file_path: string;
 }
 
+export interface OrderFormData {
+  songTitle?: string;
+  // ... other form data fields can be added here
+}
+
+export interface OrderMetadata {
+  formData?: OrderFormData;
+  // ... other metadata fields can be added here
+}
+
 export interface OrderSong {
   id: string;
   song_url: string | null;
@@ -37,7 +47,7 @@ export interface Order {
   delivery_status: string | null;
   includes_both_versions: boolean | null;
   includes_cover_image: boolean | null;
-  metadata: any | null;
+  metadata: OrderMetadata | null;
   payment_intent_id: string | null;
   payment_status: string | null;
   song_id: string;
