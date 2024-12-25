@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Image, Play, Pause } from "lucide-react";
 import { FileUrlManager } from "@/components/admin/files/FileUrlManager";
 import { useToast } from "@/hooks/use-toast";
 import { useAudio } from "@/components/audio/AudioContext";
@@ -32,15 +31,16 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
           setImageUrl(url);
         }
 
-        // Fetch the song title
-        const { data: songData, error } = await supabase
-          .from('songs')
-          .select('title')
-          .eq('id', orderSong.id)
-          .maybeSingle();
+        // Fetch the song title from orders and songs tables
+        const { data: orderData, error: orderError } = await supabase
+          .from('orders')
+          .select('songs(title)')
+          .eq('id', orderSong.order_id)
+          .single();
 
-        if (error) throw error;
-        setSongTitle(songData?.title || `Song ${orderSong.id}`);
+        if (orderError) throw orderError;
+        setSongTitle(orderData?.songs?.title || `Song ${orderSong.id}`);
+
       } catch (error) {
         console.error('Error loading media URLs:', error);
         toast({
@@ -55,33 +55,6 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
 
     loadUrls();
   }, [orderSong, toast]);
-
-  const handleDownload = async (url: string, type: 'audio' | 'image') => {
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = `${type === 'audio' ? 'song' : 'cover'}-${orderSong.id}.${type === 'audio' ? 'mp3' : 'jpg'}`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(downloadUrl);
-
-      toast({
-        title: "Download Started",
-        description: `Your ${type} file will download shortly.`,
-      });
-    } catch (error) {
-      console.error('Error downloading file:', error);
-      toast({
-        title: "Download Failed",
-        description: "Unable to download the file. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const isCurrentlyPlaying = currentTrack?.url === audioUrl && isPlaying;
 
@@ -136,10 +109,25 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
               variant="outline"
               size="sm"
               className="flex-1 h-7 text-xs hover:bg-primary hover:text-primary-foreground transition-colors duration-200"
-              onClick={() => handleDownload(audioUrl, 'audio')}
+              onClick={() => {
+                if (isCurrentlyPlaying) {
+                  pauseTrack();
+                } else {
+                  playTrack(audioUrl, songTitle, orderSong.id);
+                }
+              }}
             >
-              <Download className="w-3 h-3 mr-1" />
-              Audio
+              {isCurrentlyPlaying ? (
+                <>
+                  <Pause className="w-3 h-3 mr-1" />
+                  Pause
+                </>
+              ) : (
+                <>
+                  <Play className="w-3 h-3 mr-1" />
+                  Play
+                </>
+              )}
             </Button>
           )}
           
@@ -148,7 +136,7 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
               variant="outline"
               size="sm"
               className="flex-1 h-7 text-xs hover:bg-primary hover:text-primary-foreground transition-colors duration-200"
-              onClick={() => handleDownload(imageUrl, 'image')}
+              onClick={() => window.open(imageUrl, '_blank')}
             >
               <Download className="w-3 h-3 mr-1" />
               Cover
