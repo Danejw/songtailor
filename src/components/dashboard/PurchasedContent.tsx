@@ -69,24 +69,26 @@ export function PurchasedContent() {
       <CardHeader>
         <CardTitle>My Purchased Songs</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {orders.map((order) => (
-          <div key={order.id} className="space-y-4">
-            <div className="border-b pb-2">
-              <h3 className="font-medium text-lg">
-                {order.songs?.title || "Untitled Song"}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {order.songs?.style} • {order.songs?.themes}
-              </p>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {orders.map((order) => (
+            <div key={order.id} className="space-y-6">
+              <div className="space-y-2">
+                <h3 className="font-medium text-lg">
+                  {order.songs?.title || "Untitled Song"}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {order.songs?.style} • {order.songs?.themes}
+                </p>
+              </div>
+              <div className="grid gap-6">
+                {order.order_songs?.map((orderSong) => (
+                  <OrderMediaDisplay key={orderSong.id} orderSong={orderSong} />
+                ))}
+              </div>
             </div>
-            <div className="space-y-4">
-              {order.order_songs?.map((orderSong) => (
-                <OrderMediaDisplay key={orderSong.id} orderSong={orderSong} />
-              ))}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

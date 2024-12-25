@@ -14,6 +14,7 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
   const [audioUrl, setAudioUrl] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const loadUrls = async () => {
@@ -40,7 +41,7 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
     };
 
     loadUrls();
-  }, [orderSong]);
+  }, [orderSong, toast]);
 
   const handleDownload = async (url: string, type: 'audio' | 'image') => {
     try {
@@ -66,64 +67,75 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
 
   if (isLoading) {
     return (
-      <div className="animate-pulse space-y-4">
-        <div className="h-40 bg-gradient-to-br from-[#9b87f5]/5 to-[#7E69AB]/5 rounded-lg" />
+      <div className="animate-pulse">
+        <div className="bg-gradient-to-br from-[#9b87f5]/5 to-[#7E69AB]/5 rounded-xl h-[400px]" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <h4 className="font-medium">
-        {orderSong.is_primary ? "Primary Version" : "Alternative Version"}
-      </h4>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="bg-white/80 backdrop-blur-sm border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg">
+      <div className="relative aspect-square">
+        {imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt="Cover" 
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-[#9b87f5]/5 to-[#7E69AB]/5 flex items-center justify-center">
+            <Image className="w-16 h-16 text-[#9b87f5]/20" />
+          </div>
+        )}
+      </div>
+
+      <div className="p-6 space-y-4">
+        <h4 className="font-medium text-lg">
+          {orderSong.is_primary ? "Primary Version" : "Alternative Version"}
+        </h4>
+
         {audioUrl && (
-          <div className="p-4 border rounded-lg space-y-3 bg-white/80 backdrop-blur-sm">
-            <div className="flex items-center gap-2">
-              <AudioWaveform className="w-5 h-5 text-[#9b87f5]" />
-              <span className="font-medium">Audio Track</span>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <AudioWaveform className="w-4 h-4" />
+              <span>Audio Track</span>
             </div>
+            
             <audio 
               controls 
               className="w-full"
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
             >
               <source src={audioUrl} type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>
+          </div>
+        )}
+
+        <div className="flex gap-2 pt-2">
+          {audioUrl && (
             <Button
               variant="outline"
-              className="w-full"
+              className="flex-1"
               onClick={() => handleDownload(audioUrl, 'audio')}
             >
               <Download className="w-4 h-4 mr-2" />
               Download Audio
             </Button>
-          </div>
-        )}
-        
-        {imageUrl && (
-          <div className="p-4 border rounded-lg space-y-3 bg-white/80 backdrop-blur-sm">
-            <div className="flex items-center gap-2">
-              <Image className="w-5 h-5 text-[#9b87f5]" />
-              <span className="font-medium">Cover Image</span>
-            </div>
-            <img 
-              src={imageUrl} 
-              alt="Cover" 
-              className="w-full h-40 object-cover rounded-lg"
-            />
+          )}
+          
+          {imageUrl && (
             <Button
               variant="outline"
-              className="w-full"
+              className="flex-1"
               onClick={() => handleDownload(imageUrl, 'image')}
             >
               <Download className="w-4 h-4 mr-2" />
               Download Cover
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
