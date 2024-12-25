@@ -40,12 +40,20 @@ export function OrderUploadedFiles({
     return null;
   }
 
+  const extractFilename = (url: string) => {
+    // Extract just the filename from the full URL or path
+    const parts = url.split('/');
+    return parts[parts.length - 1];
+  };
+
   const getPublicUrl = async (bucket: string, filePath: string) => {
     if (!filePath) return '';
     
+    const filename = extractFilename(filePath);
+    
     const { data } = await supabase.storage
       .from(bucket)
-      .createSignedUrl(filePath, 3600); // 1 hour expiration
+      .createSignedUrl(filename, 3600); // 1 hour expiration
 
     return data?.signedUrl || '';
   };
