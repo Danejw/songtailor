@@ -8,7 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { OrdersList } from "@/components/dashboard/OrdersList";
 import { LyricsReview } from "@/components/dashboard/LyricsReview";
-import { NotificationsPanel } from "@/components/dashboard/NotificationsPanel";
 import { PurchasedContent } from "@/components/dashboard/PurchasedContent";
 import { ChevronDown } from "lucide-react";
 import { Loader2 } from "lucide-react";
@@ -111,11 +110,7 @@ export default function Dashboard() {
       <div className="fixed inset-0 bg-gradient-to-b from-white to-purple-50/30 grid-pattern-dark -z-10" />
       <div className="absolute inset-0 bg-white/50" />
       <div className="container mx-auto px-4 py-8 relative">
-        <DashboardHeader 
-          profile={profile}
-          activeOrdersCount={activeOrders.length}
-          completedOrdersCount={completedOrders.length}
-        />
+        <DashboardHeader profile={profile} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
           <div className="lg:col-span-2 space-y-6">
@@ -129,7 +124,12 @@ export default function Dashboard() {
               <Card>
                 <CardHeader className="cursor-pointer">
                   <CollapsibleTrigger className="flex items-center justify-between w-full">
-                    <CardTitle>Active Orders</CardTitle>
+                    <div className="flex items-center gap-4">
+                      <CardTitle>Active Orders</CardTitle>
+                      <span className="text-sm text-muted-foreground">
+                        ({activeOrders.length} {activeOrders.length === 1 ? 'order' : 'orders'})
+                      </span>
+                    </div>
                     <ChevronDown className={`h-5 w-5 transition-transform ${isActiveOrdersOpen ? 'transform rotate-180' : ''}`} />
                   </CollapsibleTrigger>
                 </CardHeader>
@@ -149,7 +149,12 @@ export default function Dashboard() {
               <Card>
                 <CardHeader className="cursor-pointer">
                   <CollapsibleTrigger className="flex items-center justify-between w-full">
-                    <CardTitle>Completed Orders</CardTitle>
+                    <div className="flex items-center gap-4">
+                      <CardTitle>Completed Orders</CardTitle>
+                      <span className="text-sm text-muted-foreground">
+                        ({completedOrders.length} {completedOrders.length === 1 ? 'order' : 'orders'})
+                      </span>
+                    </div>
                     <ChevronDown className={`h-5 w-5 transition-transform ${isCompletedOrdersOpen ? 'transform rotate-180' : ''}`} />
                   </CollapsibleTrigger>
                 </CardHeader>
