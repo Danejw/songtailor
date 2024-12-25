@@ -3,7 +3,7 @@ import { OrderMediaDisplay } from "./OrderMediaDisplay";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Music2 } from "lucide-react";
-import type { Order } from "@/components/admin/types";
+import type { Order, OrderMetadata } from "@/components/admin/types";
 
 export function PurchasedContent() {
   const { data: orders, isLoading } = useQuery({
@@ -35,7 +35,14 @@ export function PurchasedContent() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as Order[];
+
+      // Transform the data to ensure type compatibility
+      const transformedData = data.map(order => ({
+        ...order,
+        metadata: order.metadata as OrderMetadata | null,
+      }));
+
+      return transformedData as Order[];
     },
   });
 
