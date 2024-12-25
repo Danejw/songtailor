@@ -388,6 +388,7 @@ export type Database = {
           created_at: string
           id: string
           is_primary: boolean | null
+          is_public: boolean
           order_id: string | null
           song_url: string | null
         }
@@ -395,6 +396,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_primary?: boolean | null
+          is_public?: boolean
           order_id?: string | null
           song_url?: string | null
         }
@@ -402,6 +404,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_primary?: boolean | null
+          is_public?: boolean
           order_id?: string | null
           song_url?: string | null
         }

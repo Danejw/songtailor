@@ -10,6 +10,7 @@ import Pricing from "./pages/Pricing";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import SongPurchaseForm from "./components/SongPurchaseForm";
+import PublicSongs from "./pages/PublicSongs";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/order" element={<SongPurchaseForm />} />
+          <Route path="/public-songs" element={<PublicSongs />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
