@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, AudioWaveform, Image, Play, Pause } from "lucide-react";
+import { Download, Image, Play, Pause } from "lucide-react";
 import { FileUrlManager } from "@/components/admin/files/FileUrlManager";
 import { useToast } from "@/hooks/use-toast";
+import { useAudio } from "@/components/audio/AudioContext";
 import type { OrderSong } from "@/components/admin/types";
 
 interface OrderMediaDisplayProps {
@@ -11,10 +12,10 @@ interface OrderMediaDisplayProps {
 
 export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
   const { toast } = useToast();
+  const { currentTrack, isPlaying, playTrack, pauseTrack } = useAudio();
   const [audioUrl, setAudioUrl] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const loadUrls = async () => {
@@ -70,6 +71,8 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
     }
   };
 
+  const isCurrentlyPlaying = currentTrack?.url === audioUrl && isPlaying;
+
   if (isLoading) {
     return (
       <div className="animate-pulse">
@@ -98,17 +101,14 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
             size="icon"
             className="absolute bottom-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 hover:bg-white shadow-sm"
             onClick={() => {
-              const audio = document.querySelector(`#audio-${orderSong.id}`) as HTMLAudioElement;
-              if (audio.paused) {
-                audio.play();
-                setIsPlaying(true);
+              if (isCurrentlyPlaying) {
+                pauseTrack();
               } else {
-                audio.pause();
-                setIsPlaying(false);
+                playTrack(audioUrl, `Song ${orderSong.id}`);
               }
             }}
           >
-            {isPlaying ? (
+            {isCurrentlyPlaying ? (
               <Pause className="w-4 h-4 text-primary" />
             ) : (
               <Play className="w-4 h-4 text-primary" />
@@ -118,21 +118,6 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
       </div>
 
       <div className="p-3 space-y-2">
-        {audioUrl && (
-          <div className="space-y-2">
-            <audio 
-              id={`audio-${orderSong.id}`}
-              controls 
-              className="w-full h-8"
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-            >
-              <source src={audioUrl} type="audio/mpeg" />
-              Your browser does not support the audio element.
-            </audio>
-          </div>
-        )}
-
         <div className="flex gap-1 pt-1">
           {audioUrl && (
             <Button
