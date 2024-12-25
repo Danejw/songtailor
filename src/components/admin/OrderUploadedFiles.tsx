@@ -38,17 +38,15 @@ export function OrderUploadedFiles({
     return null;
   }
 
-  const getPublicUrl = (bucket: string, filePath: string) => {
+  const getPublicUrl = async (bucket: string, filePath: string) => {
     if (!filePath) return '';
     
-    const fileName = filePath.split('/').pop();
-    if (!fileName) return '';
-    
-    const { data: { publicUrl } } = supabase.storage
+    // Get the file path directly from the database
+    const { data } = await supabase.storage
       .from(bucket)
-      .getPublicUrl(fileName);
-    
-    return publicUrl;
+      .createSignedUrl(filePath, 3600); // 1 hour expiration
+
+    return data?.signedUrl || '';
   };
 
   const handleImageError = (filePath: string) => {
@@ -103,8 +101,12 @@ export function OrderUploadedFiles({
                       controls 
                       className="w-full mt-2"
                       onError={() => handleAudioError(orderSong.song_url!)}
+                      key={orderSong.song_url} // Add key to force re-render when URL changes
                     >
-                      <source src={getPublicUrl('songs', orderSong.song_url)} type="audio/mpeg" />
+                      <source 
+                        src={getPublicUrl('songs', orderSong.song_url)} 
+                        type="audio/mpeg" 
+                      />
                       Your browser does not support the audio element.
                     </audio>
                   </div>
@@ -148,13 +150,13 @@ export function OrderUploadedFiles({
               {/* Fallback messages */}
               {orderSong.song_url && failedAudio.has(orderSong.song_url) && (
                 <div className="p-4 border rounded-lg bg-muted">
-                  <p className="text-muted-foreground">Audio file unavailable</p>
+                  <p className="text-muted-foreground">Audio file unavailable or access denied</p>
                 </div>
               )}
               
               {orderSong.cover_images && failedImages.has(orderSong.cover_images.file_path) && (
                 <div className="p-4 border rounded-lg bg-muted">
-                  <p className="text-muted-foreground">Cover image unavailable</p>
+                  <p className="text-muted-foreground">Cover image unavailable or access denied</p>
                 </div>
               )}
             </div>
