@@ -24,6 +24,7 @@ export interface OrderSong {
   song_url: string | null;
   is_primary: boolean;
   cover_images: CoverImage | null;
+  is_public?: boolean;
 }
 
 export interface OrderFormData {
@@ -41,7 +42,7 @@ export interface OrderFormData {
   references?: string;
   wantCoverImage: boolean;
   wantSecondSong: boolean;
-  wantSecondCoverImage?: boolean;
+  wantSecondCoverImage: boolean;
 }
 
 export interface Order {
