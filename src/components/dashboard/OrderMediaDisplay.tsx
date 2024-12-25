@@ -73,30 +73,30 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
   if (isLoading) {
     return (
       <div className="animate-pulse">
-        <div className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl h-[400px] shadow-lg" />
+        <div className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-lg h-[200px] shadow" />
       </div>
     );
   }
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg group">
+    <div className="bg-white/80 backdrop-blur-sm border rounded-lg overflow-hidden shadow-sm transition-all duration-300 hover:shadow group">
       <div className="relative aspect-square">
         {imageUrl ? (
           <img 
             src={imageUrl} 
             alt="Cover" 
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center">
-            <Image className="w-16 h-16 text-primary/20" />
+            <Image className="w-8 h-8 text-primary/20" />
           </div>
         )}
         {audioUrl && (
           <Button
             variant="secondary"
             size="icon"
-            className="absolute bottom-4 right-4 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 hover:bg-white shadow-lg"
+            className="absolute bottom-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 hover:bg-white shadow-sm"
             onClick={() => {
               const audio = document.querySelector(`#audio-${orderSong.id}`) as HTMLAudioElement;
               if (audio.paused) {
@@ -109,30 +109,30 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
             }}
           >
             {isPlaying ? (
-              <Pause className="w-5 h-5 text-primary" />
+              <Pause className="w-4 h-4 text-primary" />
             ) : (
-              <Play className="w-5 h-5 text-primary" />
+              <Play className="w-4 h-4 text-primary" />
             )}
           </Button>
         )}
       </div>
 
-      <div className="p-6 space-y-4">
-        <h4 className="font-medium text-lg text-primary/90">
+      <div className="p-3 space-y-2">
+        <h4 className="text-xs font-medium text-primary/90">
           {orderSong.is_primary ? "Primary Version" : "Alternative Version"}
         </h4>
 
         {audioUrl && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <AudioWaveform className="w-4 h-4" />
+          <div className="space-y-2">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <AudioWaveform className="w-3 h-3" />
               <span>Audio Track</span>
             </div>
             
             <audio 
               id={`audio-${orderSong.id}`}
               controls 
-              className="w-full"
+              className="w-full h-8"
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
             >
@@ -142,26 +142,28 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
           </div>
         )}
 
-        <div className="flex gap-2 pt-2">
+        <div className="flex gap-1 pt-1">
           {audioUrl && (
             <Button
               variant="outline"
-              className="flex-1 hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
+              size="sm"
+              className="flex-1 h-7 text-xs hover:bg-primary hover:text-primary-foreground transition-colors duration-200"
               onClick={() => handleDownload(audioUrl, 'audio')}
             >
-              <Download className="w-4 h-4 mr-2" />
-              Download Audio
+              <Download className="w-3 h-3 mr-1" />
+              Audio
             </Button>
           )}
           
           {imageUrl && (
             <Button
               variant="outline"
-              className="flex-1 hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
+              size="sm"
+              className="flex-1 h-7 text-xs hover:bg-primary hover:text-primary-foreground transition-colors duration-200"
               onClick={() => handleDownload(imageUrl, 'image')}
             >
-              <Download className="w-4 h-4 mr-2" />
-              Download Cover
+              <Download className="w-3 h-3 mr-1" />
+              Cover
             </Button>
           )}
         </div>

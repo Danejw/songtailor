@@ -41,12 +41,12 @@ export function PurchasedContent() {
       <Card className="bg-white/50 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Music2 className="w-6 h-6 text-primary/80" />
+            <Music2 className="w-5 h-5 text-primary/80" />
             My Purchased Songs
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary/60" />
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-primary/60" />
         </CardContent>
       </Card>
     );
@@ -57,12 +57,12 @@ export function PurchasedContent() {
       <Card className="bg-white/50 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Music2 className="w-6 h-6 text-primary/80" />
+            <Music2 className="w-5 h-5 text-primary/80" />
             My Purchased Songs
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-muted-foreground py-12">
+          <p className="text-center text-muted-foreground py-8">
             You haven't purchased any songs yet.
           </p>
         </CardContent>
@@ -72,28 +72,28 @@ export function PurchasedContent() {
 
   return (
     <Card className="bg-white/50 backdrop-blur-sm border-primary/10">
-      <CardHeader>
+      <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
-          <Music2 className="w-6 h-6 text-primary/80" />
+          <Music2 className="w-5 h-5 text-primary/80" />
           My Purchased Songs
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {orders.map((order) => (
             <div 
               key={order.id} 
-              className="group space-y-6 transition-all duration-300 hover:scale-[1.02]"
+              className="group space-y-3"
             >
-              <div className="space-y-3">
-                <h3 className="font-medium text-lg text-primary/90 group-hover:text-primary">
+              <div className="space-y-1">
+                <h3 className="font-medium text-sm text-primary/90 group-hover:text-primary truncate">
                   {order.songs?.title || "Untitled Song"}
                 </h3>
-                <p className="text-sm text-muted-foreground/80">
+                <p className="text-xs text-muted-foreground/80 truncate">
                   {order.songs?.style} • {order.songs?.themes}
                 </p>
               </div>
-              <div className="grid gap-8">
+              <div className="grid gap-4">
                 {order.order_songs?.map((orderSong) => (
                   <OrderMediaDisplay key={orderSong.id} orderSong={orderSong} />
                 ))}
