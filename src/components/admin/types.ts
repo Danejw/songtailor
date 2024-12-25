@@ -14,7 +14,7 @@ export interface Profile {
 }
 
 export interface CoverImage {
-  id?: string; // Made optional since some queries don't return it
+  id: string;  // Changed back to required since components expect it
   file_path: string;
 }
 
@@ -46,6 +46,10 @@ export interface OrderFormData {
   wantSecondCoverImage: boolean;
 }
 
+export interface OrderMetadata {
+  formData: OrderFormData;
+}
+
 export interface Order {
   id: string;
   created_at: string;
@@ -56,7 +60,7 @@ export interface Order {
   delivery_status: string | null;
   includes_both_versions: boolean | null;
   includes_cover_image: boolean | null;
-  metadata: { formData: OrderFormData } | null;
+  metadata: OrderMetadata | null;
   payment_intent_id: string | null;
   payment_status: string | null;
   song_id: string;
@@ -65,6 +69,6 @@ export interface Order {
 }
 
 // Type guard for checking if metadata has formData
-export function hasFormData(metadata: any): metadata is { formData: OrderFormData } {
+export function hasFormData(metadata: any): metadata is OrderMetadata {
   return metadata && typeof metadata === 'object' && 'formData' in metadata;
 }

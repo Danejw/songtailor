@@ -6,6 +6,7 @@ import { useAudio } from "@/components/audio/AudioContext";
 import type { OrderSong } from "@/components/admin/types";
 import { supabase } from "@/integrations/supabase/client";
 import { Play, Pause, Download, Image } from "lucide-react";
+import { hasFormData } from "@/components/admin/types";
 
 interface OrderMediaDisplayProps {
   orderSong: OrderSong;
@@ -42,10 +43,9 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
 
           if (orderError) throw orderError;
 
-          // Safely extract song title from metadata
-          const formData = orderData?.metadata?.formData;
-          if (formData && typeof formData === 'object' && 'songTitle' in formData) {
-            setSongTitle(formData.songTitle || "Untitled Song");
+          // Safely extract song title from metadata using type guard
+          if (orderData?.metadata && hasFormData(orderData.metadata)) {
+            setSongTitle(orderData.metadata.formData.songTitle || "Untitled Song");
           }
         }
 

@@ -13,7 +13,7 @@ import { OrderSearchInput } from "./OrderSearchInput";
 import { OrderStatusFilter } from "./OrderStatusFilter";
 import { OrderTableRow } from "./OrderTableRow";
 import { RequestDetailsDialog } from "./RequestDetailsDialog";
-import type { Order } from "./types";
+import type { Order, OrderFormData, OrderMetadata } from "./types";
 
 const fetchOrdersWithDetails = async (): Promise<Order[]> => {
   const { data: sessionData } = await supabase.auth.getSession();
@@ -56,6 +56,8 @@ const fetchOrdersWithDetails = async (): Promise<Order[]> => {
         id,
         song_url,
         is_primary,
+        is_public,
+        created_at,
         cover_images!cover_images_order_song_id_fkey (
           id,
           file_path
@@ -74,7 +76,7 @@ const fetchOrdersWithDetails = async (): Promise<Order[]> => {
     ...order,
     profiles: profiles?.find(profile => profile.id === order.user_id) || null,
     order_songs: order.order_songs || null,
-    metadata: order.metadata as { formData: OrderFormData } | null
+    metadata: order.metadata as OrderMetadata | null
   })) as Order[];
 
   return ordersWithProfiles;
