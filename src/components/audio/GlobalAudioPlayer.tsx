@@ -84,49 +84,7 @@ export function GlobalAudioPlayer() {
         </div>
 
         {/* Center section: Controls and Progress */}
-        <div className="flex flex-col items-center gap-2">
-          {/* Main controls */}
-          <div className="flex items-center justify-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleSkipBack}
-              className="h-8 w-8"
-              title="Skip back 10 seconds"
-            >
-              <SkipBack className="h-4 w-4" />
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => isPlaying ? pauseTrack() : playTrack(currentTrack.url, currentTrack.title)}
-              className="h-10 w-10"
-            >
-              {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleSkipForward}
-              className="h-8 w-8"
-              title="Skip forward 10 seconds"
-            >
-              <SkipForward className="h-4 w-4" />
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleLoop}
-              className={`h-8 w-8 ${isLooping ? "text-primary" : ""}`}
-              title="Toggle loop"
-            >
-              <Repeat className="h-4 w-4" />
-            </Button>
-          </div>
-
+        <div className="flex flex-col items-center gap-3">
           {/* Progress bar */}
           <div className="flex items-center gap-2 w-full">
             <span className="text-xs text-muted-foreground w-12 text-right">
@@ -145,22 +103,63 @@ export function GlobalAudioPlayer() {
             </span>
           </div>
 
-          {/* Volume control */}
-          <div className="flex items-center gap-2 mt-1">
-            <Volume2 className="h-4 w-4 text-muted-foreground" />
-            <Slider
-              className="w-24"
-              value={[volume]}
-              min={0}
-              max={1}
-              step={0.1}
-              onValueChange={(value) => {
-                setVolume(value[0]);
-                if (audioRef.current) {
-                  audioRef.current.volume = value[0];
-                }
-              }}
-            />
+          {/* Main controls */}
+          <div className="flex items-center justify-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleLoop}
+              className={`h-8 w-8 ${isLooping ? "text-primary" : ""}`}
+              title="Toggle loop"
+            >
+              <Repeat className="h-4 w-4" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleSkipBack}
+              className="h-9 w-9"
+              title="Skip back 10 seconds"
+            >
+              <SkipBack className="h-4 w-4" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => isPlaying ? pauseTrack() : playTrack(currentTrack.url, currentTrack.title)}
+              className="h-11 w-11"
+            >
+              {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleSkipForward}
+              className="h-9 w-9"
+              title="Skip forward 10 seconds"
+            >
+              <SkipForward className="h-4 w-4" />
+            </Button>
+
+            <div className="flex items-center gap-2 ml-2">
+              <Volume2 className="h-4 w-4 text-muted-foreground" />
+              <Slider
+                className="w-20"
+                value={[volume]}
+                min={0}
+                max={1}
+                step={0.1}
+                onValueChange={(value) => {
+                  setVolume(value[0]);
+                  if (audioRef.current) {
+                    audioRef.current.volume = value[0];
+                  }
+                }}
+              />
+            </div>
           </div>
         </div>
 
