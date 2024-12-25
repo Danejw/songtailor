@@ -41,7 +41,6 @@ export function OrderUploadedFiles({
   }
 
   const extractFilename = (url: string) => {
-    // Extract just the filename from the full URL or path
     const parts = url.split('/');
     return parts[parts.length - 1];
   };
@@ -49,13 +48,25 @@ export function OrderUploadedFiles({
   const getPublicUrl = async (bucket: string, filePath: string) => {
     if (!filePath) return '';
     
-    const filename = extractFilename(filePath);
-    
-    const { data } = await supabase.storage
-      .from(bucket)
-      .createSignedUrl(filename, 3600); // 1 hour expiration
+    try {
+      const filename = extractFilename(filePath);
+      console.log('Getting signed URL for:', { bucket, filename });
+      
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(filename, 3600);
 
-    return data?.signedUrl || '';
+      if (error) {
+        console.error('Error getting signed URL:', error);
+        throw error;
+      }
+
+      console.log('Got signed URL:', data?.signedUrl);
+      return data?.signedUrl || '';
+    } catch (error) {
+      console.error('Error in getPublicUrl:', error);
+      return '';
+    }
   };
 
   useEffect(() => {
@@ -63,16 +74,30 @@ export function OrderUploadedFiles({
       // Load audio URLs
       for (const orderSong of order.order_songs || []) {
         if (orderSong.song_url && !audioUrls[orderSong.song_url]) {
-          const url = await getPublicUrl('songs', orderSong.song_url);
-          setAudioUrls(prev => ({ ...prev, [orderSong.song_url!]: url }));
+          try {
+            const url = await getPublicUrl('songs', orderSong.song_url);
+            if (url) {
+              setAudioUrls(prev => ({ ...prev, [orderSong.song_url!]: url }));
+            }
+          } catch (error) {
+            console.error('Error loading audio URL:', error);
+            setFailedAudio(prev => new Set([...prev, orderSong.song_url!]));
+          }
         }
       }
 
       // Load image URLs
       for (const orderSong of order.order_songs || []) {
         if (orderSong.cover_images?.file_path && !imageUrls[orderSong.cover_images.file_path]) {
-          const url = await getPublicUrl('covers', orderSong.cover_images.file_path);
-          setImageUrls(prev => ({ ...prev, [orderSong.cover_images!.file_path]: url }));
+          try {
+            const url = await getPublicUrl('covers', orderSong.cover_images.file_path);
+            if (url) {
+              setImageUrls(prev => ({ ...prev, [orderSong.cover_images!.file_path]: url }));
+            }
+          } catch (error) {
+            console.error('Error loading image URL:', error);
+            setFailedImages(prev => new Set([...prev, orderSong.cover_images!.file_path]));
+          }
         }
       }
     };
