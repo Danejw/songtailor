@@ -25,17 +25,37 @@ export interface OrderSong {
   cover_images: CoverImage | null;
 }
 
+export interface OrderFormData {
+  name: string;
+  email: string;
+  phone?: string;
+  songTitle?: string;
+  provideLyrics: "yes" | "no";
+  lyrics?: string;
+  theme?: string;
+  musicStyle: string;
+  otherMusicStyle?: string;
+  mood: string;
+  otherMood?: string;
+  references?: string;
+  wantCoverImage: boolean;
+  wantSecondSong: boolean;
+  wantSecondCoverImage?: boolean;
+}
+
 export interface Order {
   id: string;
   created_at: string;
   status: string;
   songs: Song | null;
-  profiles?: Profile | null; // Made optional with ?
+  profiles?: Profile | null;
   amount: number;
   delivery_status: string | null;
   includes_both_versions: boolean | null;
   includes_cover_image: boolean | null;
-  metadata: any | null;
+  metadata: {
+    formData: OrderFormData;
+  } | null;
   payment_intent_id: string | null;
   payment_status: string | null;
   song_id: string;
