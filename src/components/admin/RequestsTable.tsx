@@ -14,6 +14,7 @@ import { OrderStatusFilter } from "./OrderStatusFilter";
 import { OrderTableRow } from "./OrderTableRow";
 import { RequestDetailsDialog } from "./RequestDetailsDialog";
 import type { Order, OrderFormData, OrderMetadata } from "./types";
+import { convertToOrderMetadata } from "./types";
 
 const fetchOrdersWithDetails = async (): Promise<Order[]> => {
   const { data: sessionData } = await supabase.auth.getSession();
@@ -76,7 +77,7 @@ const fetchOrdersWithDetails = async (): Promise<Order[]> => {
     ...order,
     profiles: profiles?.find(profile => profile.id === order.user_id) || null,
     order_songs: order.order_songs || null,
-    metadata: order.metadata as OrderMetadata | null
+    metadata: convertToOrderMetadata(order.metadata)
   })) as Order[];
 
   return ordersWithProfiles;

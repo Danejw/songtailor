@@ -14,7 +14,7 @@ export interface Profile {
 }
 
 export interface CoverImage {
-  id: string;  // Changed back to required since components expect it
+  id: string;
   file_path: string;
 }
 
@@ -69,6 +69,18 @@ export interface Order {
 }
 
 // Type guard for checking if metadata has formData
-export function hasFormData(metadata: any): metadata is OrderMetadata {
-  return metadata && typeof metadata === 'object' && 'formData' in metadata;
+export function hasFormData(metadata: unknown): metadata is OrderMetadata {
+  return (
+    !!metadata &&
+    typeof metadata === 'object' &&
+    'formData' in metadata &&
+    typeof (metadata as OrderMetadata).formData === 'object'
+  );
+}
+
+// Type guard for safely converting JSON to OrderMetadata
+export function convertToOrderMetadata(data: unknown): OrderMetadata | null {
+  if (!data || typeof data !== 'object') return null;
+  if (hasFormData(data)) return data;
+  return null;
 }

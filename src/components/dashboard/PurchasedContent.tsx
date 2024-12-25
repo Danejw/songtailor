@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Music2 } from "lucide-react";
 import type { Order, OrderMetadata } from "@/components/admin/types";
+import { convertToOrderMetadata } from "@/components/admin/types";
 
 export function PurchasedContent() {
   const { data: orders, isLoading } = useQuery({
@@ -39,7 +40,7 @@ export function PurchasedContent() {
       // Transform the data to match our Order type
       return (data || []).map(order => ({
         ...order,
-        metadata: order.metadata as OrderMetadata | null,
+        metadata: convertToOrderMetadata(order.metadata),
         order_songs: order.order_songs || null
       })) as Order[];
     },
