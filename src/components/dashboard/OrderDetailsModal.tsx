@@ -9,9 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Eye } from "lucide-react";
 import { OrderMediaDisplay } from "./OrderMediaDisplay";
+import type { Order } from "@/components/admin/types";
 
 interface OrderDetailsModalProps {
-  order: any;
+  order: Order;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -49,7 +50,7 @@ export const OrderDetailsModal: FC<OrderDetailsModalProps> = ({
           {order.order_songs?.length > 0 && (
             <div className="space-y-4">
               <h3 className="font-semibold">Song Files</h3>
-              {order.order_songs.map((orderSong: any) => (
+              {order.order_songs.map((orderSong) => (
                 <OrderMediaDisplay key={orderSong.id} orderSong={orderSong} />
               ))}
             </div>

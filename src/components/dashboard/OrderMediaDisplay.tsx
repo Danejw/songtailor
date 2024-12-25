@@ -1,18 +1,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Music, Image as ImageIcon } from "lucide-react";
+import { Download, AudioWaveform, Image } from "lucide-react";
 import { FileUrlManager } from "@/components/admin/files/FileUrlManager";
 import { useToast } from "@/hooks/use-toast";
+import type { OrderSong } from "@/components/admin/types";
 
 interface OrderMediaDisplayProps {
-  orderSong: {
-    id: string;
-    song_url: string | null;
-    cover_images?: {
-      file_path: string;
-    } | null;
-    is_primary: boolean;
-  };
+  orderSong: OrderSong;
 }
 
 export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
@@ -88,7 +82,7 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
         {audioUrl && (
           <div className="p-4 border rounded-lg space-y-3 bg-white/80 backdrop-blur-sm">
             <div className="flex items-center gap-2">
-              <Music className="w-5 h-5 text-[#9b87f5]" />
+              <AudioWaveform className="w-5 h-5 text-[#9b87f5]" />
               <span className="font-medium">Audio Track</span>
             </div>
             <audio 
@@ -112,7 +106,7 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
         {imageUrl && (
           <div className="p-4 border rounded-lg space-y-3 bg-white/80 backdrop-blur-sm">
             <div className="flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-[#9b87f5]" />
+              <Image className="w-5 h-5 text-[#9b87f5]" />
               <span className="font-medium">Cover Image</span>
             </div>
             <img 
