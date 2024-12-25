@@ -104,61 +104,65 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <DashboardHeader 
-        profile={profile}
-        activeOrdersCount={activeOrders.length}
-        completedOrdersCount={completedOrders.length}
-      />
+    <div className="relative min-h-screen">
+      <div className="fixed inset-0 bg-gradient-to-b from-white to-purple-50/30 grid-pattern-dark -z-10" />
+      <div className="absolute inset-0 bg-white/50" />
+      <div className="container mx-auto px-4 py-8 relative">
+        <DashboardHeader 
+          profile={profile}
+          activeOrdersCount={activeOrders.length}
+          completedOrdersCount={completedOrders.length}
+        />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-        <div className="lg:col-span-2 space-y-6">
-          <PurchasedContent />
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Active Orders</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <OrdersList orders={activeOrders} type="active" />
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+          <div className="lg:col-span-2 space-y-6">
+            <PurchasedContent />
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Active Orders</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <OrdersList orders={activeOrders} type="active" />
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Completed Orders</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <OrdersList orders={completedOrders} type="completed" />
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Completed Orders</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <OrdersList orders={completedOrders} type="completed" />
+              </CardContent>
+            </Card>
 
-          <LyricsReview orders={activeOrders} />
-        </div>
+            <LyricsReview orders={activeOrders} />
+          </div>
 
-        <div className="space-y-6">
-          <NotificationsPanel userId={profile?.id} />
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button 
-                className="w-full" 
-                onClick={() => navigate('/order')}
-              >
-                Order New Song
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => navigate('/account')}
-              >
-                Update Account Info
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="space-y-6">
+            <NotificationsPanel userId={profile?.id} />
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Button 
+                  className="w-full" 
+                  onClick={() => navigate('/order')}
+                >
+                  Order New Song
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => navigate('/account')}
+                >
+                  Update Account Info
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
