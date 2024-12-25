@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { OrdersList } from "@/components/dashboard/OrdersList";
 import { LyricsReview } from "@/components/dashboard/LyricsReview";
 import { NotificationsPanel } from "@/components/dashboard/NotificationsPanel";
-import { DownloadSection } from "@/components/dashboard/DownloadSection";
 import { PurchasedContent } from "@/components/dashboard/PurchasedContent";
+import { ChevronDown } from "lucide-react";
 import { Loader2 } from "lucide-react";
 
 export default function Dashboard() {
@@ -19,6 +20,8 @@ export default function Dashboard() {
   const [profile, setProfile] = useState<any>(null);
   const [activeOrders, setActiveOrders] = useState<any[]>([]);
   const [completedOrders, setCompletedOrders] = useState<any[]>([]);
+  const [isActiveOrdersOpen, setIsActiveOrdersOpen] = useState(true);
+  const [isCompletedOrdersOpen, setIsCompletedOrdersOpen] = useState(true);
 
   useEffect(() => {
     checkAuth();
@@ -118,23 +121,45 @@ export default function Dashboard() {
           <div className="lg:col-span-2 space-y-6">
             <PurchasedContent />
             
-            <Card>
-              <CardHeader>
-                <CardTitle>Active Orders</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <OrdersList orders={activeOrders} type="active" />
-              </CardContent>
-            </Card>
+            <Collapsible
+              open={isActiveOrdersOpen}
+              onOpenChange={setIsActiveOrdersOpen}
+              className="w-full"
+            >
+              <Card>
+                <CardHeader className="cursor-pointer">
+                  <CollapsibleTrigger className="flex items-center justify-between w-full">
+                    <CardTitle>Active Orders</CardTitle>
+                    <ChevronDown className={`h-5 w-5 transition-transform ${isActiveOrdersOpen ? 'transform rotate-180' : ''}`} />
+                  </CollapsibleTrigger>
+                </CardHeader>
+                <CollapsibleContent>
+                  <CardContent>
+                    <OrdersList orders={activeOrders} type="active" />
+                  </CardContent>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Completed Orders</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <OrdersList orders={completedOrders} type="completed" />
-              </CardContent>
-            </Card>
+            <Collapsible
+              open={isCompletedOrdersOpen}
+              onOpenChange={setIsCompletedOrdersOpen}
+              className="w-full"
+            >
+              <Card>
+                <CardHeader className="cursor-pointer">
+                  <CollapsibleTrigger className="flex items-center justify-between w-full">
+                    <CardTitle>Completed Orders</CardTitle>
+                    <ChevronDown className={`h-5 w-5 transition-transform ${isCompletedOrdersOpen ? 'transform rotate-180' : ''}`} />
+                  </CollapsibleTrigger>
+                </CardHeader>
+                <CollapsibleContent>
+                  <CardContent>
+                    <OrdersList orders={completedOrders} type="completed" />
+                  </CardContent>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>
 
             <LyricsReview orders={activeOrders} />
           </div>
