@@ -22,6 +22,7 @@ export function PurchasedContent() {
           ),
           order_songs (
             id,
+            order_id,
             song_url,
             is_primary,
             cover_images (

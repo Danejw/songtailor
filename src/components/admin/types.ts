@@ -20,6 +20,7 @@ export interface CoverImage {
 
 export interface OrderSong {
   id: string;
+  order_id: string | null;
   song_url: string | null;
   is_primary: boolean;
   cover_images: CoverImage | null;

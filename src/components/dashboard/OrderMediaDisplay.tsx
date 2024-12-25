@@ -32,19 +32,22 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
           setImageUrl(url);
         }
 
-        // Fetch the song title from orders table
-        const { data: orderData, error: orderError } = await supabase
-          .from('orders')
-          .select('metadata')
-          .eq('id', orderSong.order_id)
-          .single();
+        // Only fetch order data if we have an order_id
+        if (orderSong.order_id) {
+          const { data: orderData, error: orderError } = await supabase
+            .from('orders')
+            .select('metadata')
+            .eq('id', orderSong.order_id)
+            .maybeSingle();
 
-        if (orderError) throw orderError;
+          if (orderError) throw orderError;
 
-        // Extract song title from metadata
-        const formData = orderData?.metadata?.formData;
-        const title = formData?.songTitle || "Untitled Song";
-        setSongTitle(title);
+          // Safely extract song title from metadata
+          const formData = orderData?.metadata?.formData;
+          if (formData && typeof formData === 'object' && 'songTitle' in formData) {
+            setSongTitle(formData.songTitle || "Untitled Song");
+          }
+        }
 
       } catch (error) {
         console.error('Error loading media URLs:', error);
