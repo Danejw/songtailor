@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, AudioWaveform, Image } from "lucide-react";
+import { Download, AudioWaveform, Image, Play, Pause } from "lucide-react";
 import { FileUrlManager } from "@/components/admin/files/FileUrlManager";
 import { useToast } from "@/hooks/use-toast";
 import type { OrderSong } from "@/components/admin/types";
@@ -55,6 +55,11 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(downloadUrl);
+
+      toast({
+        title: "Download Started",
+        description: `Your ${type} file will download shortly.`,
+      });
     } catch (error) {
       console.error('Error downloading file:', error);
       toast({
@@ -68,29 +73,52 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
   if (isLoading) {
     return (
       <div className="animate-pulse">
-        <div className="bg-gradient-to-br from-[#9b87f5]/5 to-[#7E69AB]/5 rounded-xl h-[400px]" />
+        <div className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl h-[400px] shadow-lg" />
       </div>
     );
   }
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg">
+    <div className="bg-white/80 backdrop-blur-sm border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg group">
       <div className="relative aspect-square">
         {imageUrl ? (
           <img 
             src={imageUrl} 
             alt="Cover" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#9b87f5]/5 to-[#7E69AB]/5 flex items-center justify-center">
-            <Image className="w-16 h-16 text-[#9b87f5]/20" />
+          <div className="w-full h-full bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center">
+            <Image className="w-16 h-16 text-primary/20" />
           </div>
+        )}
+        {audioUrl && (
+          <Button
+            variant="secondary"
+            size="icon"
+            className="absolute bottom-4 right-4 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 hover:bg-white shadow-lg"
+            onClick={() => {
+              const audio = document.querySelector(`#audio-${orderSong.id}`) as HTMLAudioElement;
+              if (audio.paused) {
+                audio.play();
+                setIsPlaying(true);
+              } else {
+                audio.pause();
+                setIsPlaying(false);
+              }
+            }}
+          >
+            {isPlaying ? (
+              <Pause className="w-5 h-5 text-primary" />
+            ) : (
+              <Play className="w-5 h-5 text-primary" />
+            )}
+          </Button>
         )}
       </div>
 
       <div className="p-6 space-y-4">
-        <h4 className="font-medium text-lg">
+        <h4 className="font-medium text-lg text-primary/90">
           {orderSong.is_primary ? "Primary Version" : "Alternative Version"}
         </h4>
 
@@ -102,6 +130,7 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
             </div>
             
             <audio 
+              id={`audio-${orderSong.id}`}
               controls 
               className="w-full"
               onPlay={() => setIsPlaying(true)}
@@ -117,7 +146,7 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
           {audioUrl && (
             <Button
               variant="outline"
-              className="flex-1"
+              className="flex-1 hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
               onClick={() => handleDownload(audioUrl, 'audio')}
             >
               <Download className="w-4 h-4 mr-2" />
@@ -128,7 +157,7 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
           {imageUrl && (
             <Button
               variant="outline"
-              className="flex-1"
+              className="flex-1 hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
               onClick={() => handleDownload(imageUrl, 'image')}
             >
               <Download className="w-4 h-4 mr-2" />
