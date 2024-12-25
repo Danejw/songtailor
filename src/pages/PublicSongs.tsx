@@ -13,15 +13,29 @@ const PublicSongs = () => {
       const { data, error } = await supabase
         .from('order_songs')
         .select(`
-          *,
+          id,
+          order_id,
+          song_url,
+          is_primary,
+          is_public,
+          created_at,
           cover_images (
+            id,
             file_path
           )
         `)
         .eq('is_public', true);
 
       if (error) throw error;
-      return data as OrderSong[];
+      
+      // Transform the data to match our OrderSong type
+      return (data || []).map(song => ({
+        ...song,
+        cover_images: song.cover_images ? {
+          id: song.cover_images.id,
+          file_path: song.cover_images.file_path
+        } : null
+      })) as OrderSong[];
     },
   });
 

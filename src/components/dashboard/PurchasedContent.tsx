@@ -35,7 +35,13 @@ export function PurchasedContent() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as Order[];
+
+      // Transform the data to match our Order type
+      return (data || []).map(order => ({
+        ...order,
+        metadata: order.metadata as { formData: OrderFormData } | null,
+        order_songs: order.order_songs || null
+      })) as Order[];
     },
   });
 

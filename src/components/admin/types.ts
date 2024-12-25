@@ -14,7 +14,7 @@ export interface Profile {
 }
 
 export interface CoverImage {
-  id: string;
+  id?: string; // Made optional since some queries don't return it
   file_path: string;
 }
 
@@ -23,8 +23,9 @@ export interface OrderSong {
   order_id: string | null;
   song_url: string | null;
   is_primary: boolean;
+  is_public: boolean;
+  created_at: string;
   cover_images: CoverImage | null;
-  is_public?: boolean;
 }
 
 export interface OrderFormData {
@@ -55,12 +56,15 @@ export interface Order {
   delivery_status: string | null;
   includes_both_versions: boolean | null;
   includes_cover_image: boolean | null;
-  metadata: {
-    formData: OrderFormData;
-  } | null;
+  metadata: { formData: OrderFormData } | null;
   payment_intent_id: string | null;
   payment_status: string | null;
   song_id: string;
   user_id: string;
   order_songs: OrderSong[] | null;
+}
+
+// Type guard for checking if metadata has formData
+export function hasFormData(metadata: any): metadata is { formData: OrderFormData } {
+  return metadata && typeof metadata === 'object' && 'formData' in metadata;
 }
