@@ -118,17 +118,8 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
       </div>
 
       <div className="p-3 space-y-2">
-        <h4 className="text-xs font-medium text-primary/90">
-          {orderSong.is_primary ? "Primary Version" : "Alternative Version"}
-        </h4>
-
         {audioUrl && (
           <div className="space-y-2">
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <AudioWaveform className="w-3 h-3" />
-              <span>Audio Track</span>
-            </div>
-            
             <audio 
               id={`audio-${orderSong.id}`}
               controls 
