@@ -71,9 +71,9 @@ export const Navigation = () => {
                 Dashboard
               </Link>
             )}
-            <a href="#contact" className="text-gray-600 hover:text-purple-600">
+            <Link to="/contact" className="text-gray-600 hover:text-purple-600">
               Contact
-            </a>
+            </Link>
             {isAuthenticated ? (
               <Button variant="outline" onClick={handleSignOut}>
                 Sign Out
@@ -117,9 +117,9 @@ export const Navigation = () => {
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
-                  <a href="#contact" className="w-full">
+                  <Link to="/contact" className="w-full">
                     Contact
-                  </a>
+                  </Link>
                 </DropdownMenuItem>
                 {isAuthenticated ? (
                   <DropdownMenuItem onClick={handleSignOut} className="w-full">
