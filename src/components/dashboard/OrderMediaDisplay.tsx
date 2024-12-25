@@ -5,6 +5,7 @@ import { FileUrlManager } from "@/components/admin/files/FileUrlManager";
 import { useToast } from "@/hooks/use-toast";
 import { useAudio } from "@/components/audio/AudioContext";
 import type { OrderSong } from "@/components/admin/types";
+import { supabase } from "@/integrations/supabase/client";
 
 interface OrderMediaDisplayProps {
   orderSong: OrderSong;
@@ -16,6 +17,7 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
   const [audioUrl, setAudioUrl] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
+  const [songTitle, setSongTitle] = useState<string>("");
 
   useEffect(() => {
     const loadUrls = async () => {
@@ -29,6 +31,16 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
           const url = await FileUrlManager.getPublicUrl('covers', orderSong.cover_images.file_path);
           setImageUrl(url);
         }
+
+        // Fetch the song title
+        const { data: songData, error } = await supabase
+          .from('songs')
+          .select('title')
+          .eq('id', orderSong.id)
+          .maybeSingle();
+
+        if (error) throw error;
+        setSongTitle(songData?.title || `Song ${orderSong.id}`);
       } catch (error) {
         console.error('Error loading media URLs:', error);
         toast({
@@ -104,7 +116,7 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
               if (isCurrentlyPlaying) {
                 pauseTrack();
               } else {
-                playTrack(audioUrl, `Song ${orderSong.id}`);
+                playTrack(audioUrl, songTitle, orderSong.id);
               }
             }}
           >
