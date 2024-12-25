@@ -4,10 +4,9 @@ interface AudioContextType {
   currentTrack: {
     url: string;
     title: string;
-    songId: string;
   } | null;
   isPlaying: boolean;
-  playTrack: (url: string, title: string, songId: string) => void;
+  playTrack: (url: string, title: string) => void;
   pauseTrack: () => void;
   stopTrack: () => void;
 }
@@ -15,14 +14,14 @@ interface AudioContextType {
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
 export function AudioProvider({ children }: { children: ReactNode }) {
-  const [currentTrack, setCurrentTrack] = useState<{ url: string; title: string; songId: string } | null>(null);
+  const [currentTrack, setCurrentTrack] = useState<{ url: string; title: string } | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const playTrack = (url: string, title: string, songId: string) => {
+  const playTrack = (url: string, title: string) => {
     if (currentTrack?.url === url) {
       setIsPlaying(true);
     } else {
-      setCurrentTrack({ url, title, songId });
+      setCurrentTrack({ url, title });
       setIsPlaying(true);
     }
   };

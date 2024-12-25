@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Download, Image, Play, Pause } from "lucide-react";
 import { FileUrlManager } from "@/components/admin/files/FileUrlManager";
 import { useToast } from "@/hooks/use-toast";
 import { useAudio } from "@/components/audio/AudioContext";
 import type { OrderSong } from "@/components/admin/types";
-import { supabase } from "@/integrations/supabase/client";
-import { Play, Pause, Download, Image } from "lucide-react";
-import { hasFormData } from "@/components/admin/types";
 
 interface OrderMediaDisplayProps {
   orderSong: OrderSong;
@@ -18,7 +16,6 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
   const [audioUrl, setAudioUrl] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
-  const [songTitle, setSongTitle] = useState<string>("Untitled Song");
 
   useEffect(() => {
     const loadUrls = async () => {
@@ -32,23 +29,6 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
           const url = await FileUrlManager.getPublicUrl('covers', orderSong.cover_images.file_path);
           setImageUrl(url);
         }
-
-        // Only fetch order data if we have an order_id
-        if (orderSong.order_id) {
-          const { data: orderData, error: orderError } = await supabase
-            .from('orders')
-            .select('metadata')
-            .eq('id', orderSong.order_id)
-            .maybeSingle();
-
-          if (orderError) throw orderError;
-
-          // Safely extract song title from metadata
-          if (orderData?.metadata && hasFormData(orderData.metadata)) {
-            setSongTitle(orderData.metadata.formData.songTitle || "Untitled Song");
-          }
-        }
-
       } catch (error) {
         console.error('Error loading media URLs:', error);
         toast({
@@ -63,6 +43,33 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
 
     loadUrls();
   }, [orderSong, toast]);
+
+  const handleDownload = async (url: string, type: 'audio' | 'image') => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `${type === 'audio' ? 'song' : 'cover'}-${orderSong.id}.${type === 'audio' ? 'mp3' : 'jpg'}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+
+      toast({
+        title: "Download Started",
+        description: `Your ${type} file will download shortly.`,
+      });
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      toast({
+        title: "Download Failed",
+        description: "Unable to download the file. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const isCurrentlyPlaying = currentTrack?.url === audioUrl && isPlaying;
 
@@ -97,7 +104,7 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
               if (isCurrentlyPlaying) {
                 pauseTrack();
               } else {
-                playTrack(audioUrl, songTitle, orderSong.id);
+                playTrack(audioUrl, `Song ${orderSong.id}`);
               }
             }}
           >
@@ -117,25 +124,10 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
               variant="outline"
               size="sm"
               className="flex-1 h-7 text-xs hover:bg-primary hover:text-primary-foreground transition-colors duration-200"
-              onClick={() => {
-                if (isCurrentlyPlaying) {
-                  pauseTrack();
-                } else {
-                  playTrack(audioUrl, songTitle, orderSong.id);
-                }
-              }}
+              onClick={() => handleDownload(audioUrl, 'audio')}
             >
-              {isCurrentlyPlaying ? (
-                <>
-                  <Pause className="w-3 h-3 mr-1" />
-                  Pause
-                </>
-              ) : (
-                <>
-                  <Play className="w-3 h-3 mr-1" />
-                  Play
-                </>
-              )}
+              <Download className="w-3 h-3 mr-1" />
+              Audio
             </Button>
           )}
           
@@ -144,7 +136,7 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
               variant="outline"
               size="sm"
               className="flex-1 h-7 text-xs hover:bg-primary hover:text-primary-foreground transition-colors duration-200"
-              onClick={() => window.open(imageUrl, '_blank')}
+              onClick={() => handleDownload(imageUrl, 'image')}
             >
               <Download className="w-3 h-3 mr-1" />
               Cover

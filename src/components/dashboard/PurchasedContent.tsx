@@ -3,7 +3,7 @@ import { OrderMediaDisplay } from "./OrderMediaDisplay";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Music2 } from "lucide-react";
-import type { Order, OrderMetadata } from "@/components/admin/types";
+import type { Order } from "@/components/admin/types";
 
 export function PurchasedContent() {
   const { data: orders, isLoading } = useQuery({
@@ -16,13 +16,10 @@ export function PurchasedContent() {
           songs!fk_song (
             title,
             style,
-            themes,
-            lyrics,
-            reference_links
+            themes
           ),
           order_songs (
             id,
-            order_id,
             song_url,
             is_primary,
             cover_images (
@@ -35,14 +32,7 @@ export function PurchasedContent() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-
-      // Transform the data to ensure type compatibility
-      const transformedData = data.map(order => ({
-        ...order,
-        metadata: order.metadata as OrderMetadata | null,
-      }));
-
-      return transformedData as Order[];
+      return data as Order[];
     },
   });
 
@@ -90,14 +80,14 @@ export function PurchasedContent() {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {orders?.map((order) => (
+          {orders.map((order) => (
             <div 
               key={order.id} 
               className="group space-y-3"
             >
               <div className="space-y-1">
                 <h3 className="font-medium text-sm text-primary/90 group-hover:text-primary truncate">
-                  {order.metadata?.formData?.songTitle || order.songs?.title || "Untitled Song"}
+                  {order.songs?.title || "Untitled Song"}
                 </h3>
                 <p className="text-xs text-muted-foreground/80 truncate">
                   {order.songs?.style} • {order.songs?.themes}

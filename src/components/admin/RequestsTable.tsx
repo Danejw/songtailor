@@ -13,7 +13,7 @@ import { OrderSearchInput } from "./OrderSearchInput";
 import { OrderStatusFilter } from "./OrderStatusFilter";
 import { OrderTableRow } from "./OrderTableRow";
 import { RequestDetailsDialog } from "./RequestDetailsDialog";
-import type { Order, Profile, OrderMetadata } from "./types";
+import type { Order, Profile } from "./types";
 
 const fetchOrdersWithDetails = async (): Promise<Order[]> => {
   const { data: sessionData } = await supabase.auth.getSession();
@@ -70,17 +70,11 @@ const fetchOrdersWithDetails = async (): Promise<Order[]> => {
   }
 
   // Manually join the profiles data with orders and ensure type safety
-  const ordersWithProfiles = ordersData?.map(order => {
-    // Cast metadata to OrderMetadata if it exists
-    const metadata = order.metadata as OrderMetadata | null;
-    
-    return {
-      ...order,
-      metadata,
-      profiles: profiles?.find(profile => profile.id === order.user_id) || null,
-      order_songs: order.order_songs || null
-    };
-  });
+  const ordersWithProfiles = ordersData?.map(order => ({
+    ...order,
+    profiles: profiles?.find(profile => profile.id === order.user_id) || null,
+    order_songs: order.order_songs || null
+  }));
 
   return ordersWithProfiles as Order[];
 };

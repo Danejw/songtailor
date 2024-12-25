@@ -4,8 +4,6 @@ import { PublicSongCard } from "@/components/public/PublicSongCard";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Music, Loader2 } from "lucide-react";
-import type { OrderSong, Order } from "@/components/admin/types";
-import { hasFormData } from "@/components/admin/types";
 
 const PublicSongs = () => {
   const { data: publicSongs, isLoading } = useQuery({
@@ -16,7 +14,6 @@ const PublicSongs = () => {
         .select(`
           *,
           cover_images (
-            id,
             file_path
           ),
           orders (
@@ -29,13 +26,7 @@ const PublicSongs = () => {
         .eq('is_public', true);
 
       if (error) throw error;
-      
-      // Type assertion after validation
-      const typedData = data as unknown as (OrderSong & {
-        orders: Order & { songs: { title: string } };
-      })[];
-      
-      return typedData;
+      return data;
     },
   });
 
@@ -77,15 +68,16 @@ const PublicSongs = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
             {publicSongs.map((song) => {
-              const title = song.orders?.metadata && hasFormData(song.orders.metadata)
-                ? song.orders.metadata.formData.songTitle
-                : song.orders?.songs?.title || "Untitled Song";
-                
+              const metadata = song.orders?.metadata as { formData?: OrderFormData } | null;
+              const songTitle = metadata?.formData?.songTitle || 
+                              song.orders?.songs?.title || 
+                              "Untitled Song";
+              
               return (
-                <PublicSongCard
-                  key={song.id}
+                <PublicSongCard 
+                  key={song.id} 
                   song={song}
-                  title={title}
+                  title={songTitle}
                 />
               );
             })}
