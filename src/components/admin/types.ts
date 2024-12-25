@@ -23,6 +23,8 @@ export interface OrderSong {
   song_url: string | null;
   is_primary: boolean;
   cover_images: CoverImage | null;
+  metadata?: { songTitle?: string } | null;
+  order_id?: string;
 }
 
 export interface Order {
@@ -30,7 +32,7 @@ export interface Order {
   created_at: string;
   status: string;
   songs: Song | null;
-  profiles?: Profile | null; // Made optional with ?
+  profiles?: Profile | null;
   amount: number;
   delivery_status: string | null;
   includes_both_versions: boolean | null;

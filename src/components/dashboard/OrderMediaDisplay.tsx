@@ -1,23 +1,21 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { FileUrlManager } from "@/components/admin/files/FileUrlManager";
-import { useToast } from "@/hooks/use-toast";
 import { useAudio } from "@/components/audio/AudioContext";
 import type { OrderSong } from "@/components/admin/types";
 import { supabase } from "@/integrations/supabase/client";
-import { Play, Pause, Download, Image } from "lucide-react"; // Added missing imports
+import { Play, Pause, Download, Image } from "lucide-react";
 
 interface OrderMediaDisplayProps {
   orderSong: OrderSong;
 }
 
 export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
-  const { toast } = useToast();
   const { currentTrack, isPlaying, playTrack, pauseTrack } = useAudio();
   const [audioUrl, setAudioUrl] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
-  const [songTitle, setSongTitle] = useState<string>("");
+  const [songTitle, setSongTitle] = useState<string>("Untitled Song");
 
   useEffect(() => {
     const loadUrls = async () => {
@@ -32,30 +30,19 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
           setImageUrl(url);
         }
 
-        // Fetch the song title from orders and songs tables
-        const { data: orderData, error: orderError } = await supabase
-          .from('orders')
-          .select('songs(title)')
-          .eq('id', orderSong.order_id)
-          .single();
-
-        if (orderError) throw orderError;
-        setSongTitle(orderData?.songs?.title || `Song ${orderSong.id}`);
+        // Get song title from metadata
+        const title = orderSong.metadata?.songTitle || "Untitled Song";
+        setSongTitle(title);
 
       } catch (error) {
         console.error('Error loading media URLs:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load media files",
-          variant: "destructive",
-        });
       } finally {
         setIsLoading(false);
       }
     };
 
     loadUrls();
-  }, [orderSong, toast]);
+  }, [orderSong]);
 
   const isCurrentlyPlaying = currentTrack?.url === audioUrl && isPlaying;
 
