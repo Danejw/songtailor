@@ -4,6 +4,7 @@ import { PublicSongCard } from "@/components/public/PublicSongCard";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Music, Loader2 } from "lucide-react";
+import type { OrderSong, Order } from "@/components/admin/types";
 
 const PublicSongs = () => {
   const { data: publicSongs, isLoading } = useQuery({
@@ -18,7 +19,7 @@ const PublicSongs = () => {
           ),
           orders (
             metadata,
-            songs:song_id (
+            songs (
               title
             )
           )
@@ -26,7 +27,9 @@ const PublicSongs = () => {
         .eq('is_public', true);
 
       if (error) throw error;
-      return data;
+      return data as (OrderSong & {
+        orders: Order & { songs: { title: string } };
+      })[];
     },
   });
 
@@ -67,20 +70,17 @@ const PublicSongs = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
-            {publicSongs.map((song) => {
-              const metadata = song.orders?.metadata as { formData?: OrderFormData } | null;
-              const songTitle = metadata?.formData?.songTitle || 
-                              song.orders?.songs?.title || 
-                              "Untitled Song";
-              
-              return (
-                <PublicSongCard 
-                  key={song.id} 
-                  song={song}
-                  title={songTitle}
-                />
-              );
-            })}
+            {publicSongs.map((song) => (
+              <PublicSongCard
+                key={song.id}
+                song={song}
+                title={
+                  song.orders?.metadata?.formData?.songTitle ||
+                  song.orders?.songs?.title ||
+                  "Untitled Song"
+                }
+              />
+            ))}
           </div>
         )}
       </main>
