@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, Music, Image as ImageIcon } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { FileUrlManager } from "@/components/admin/files/FileUrlManager";
+import { useToast } from "@/hooks/use-toast";
 
 interface OrderMediaDisplayProps {
   orderSong: {
@@ -16,6 +16,7 @@ interface OrderMediaDisplayProps {
 }
 
 export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
+  const { toast } = useToast();
   const [audioUrl, setAudioUrl] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
@@ -34,6 +35,11 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
         }
       } catch (error) {
         console.error('Error loading media URLs:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load media files",
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -53,8 +59,14 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
     } catch (error) {
       console.error('Error downloading file:', error);
+      toast({
+        title: "Download Failed",
+        description: "Unable to download the file. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
