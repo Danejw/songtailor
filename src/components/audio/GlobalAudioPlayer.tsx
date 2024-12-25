@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAudio } from "./AudioContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, SkipBack, SkipForward, Heart } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 
 export function GlobalAudioPlayer() {
@@ -10,7 +10,6 @@ export function GlobalAudioPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -120,17 +119,6 @@ export function GlobalAudioPlayer() {
             className="h-10 w-10"
           >
             <SkipForward className="h-6 w-6" />
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsLiked(!isLiked)}
-            className="h-10 w-10 ml-4"
-          >
-            <Heart 
-              className={`h-6 w-6 ${isLiked ? 'fill-current text-red-500' : ''}`} 
-            />
           </Button>
         </div>
       </div>
