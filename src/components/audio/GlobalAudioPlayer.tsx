@@ -2,16 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { useAudio } from "./AudioContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, X, Volume2, SkipBack, SkipForward, Repeat } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Heart } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 
 export function GlobalAudioPlayer() {
   const { currentTrack, isPlaying, pauseTrack, playTrack, stopTrack } = useAudio();
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [volume, setVolume] = useState(1);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [isLooping, setIsLooping] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -64,114 +63,74 @@ export function GlobalAudioPlayer() {
     }
   };
 
-  const toggleLoop = () => {
-    if (audioRef.current) {
-      audioRef.current.loop = !isLooping;
-      setIsLooping(!isLooping);
-    }
-  };
-
   if (!currentTrack) return null;
 
   return (
     <Card className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-lg border-t z-50">
-      <div className="container mx-auto grid grid-cols-[1fr_2fr_1fr] gap-4 items-center">
-        {/* Left section: Title */}
-        <div className="flex items-center min-w-[200px]">
-          <div className="truncate">
-            <p className="text-sm font-medium">{currentTrack.title}</p>
+      <div className="container max-w-2xl mx-auto space-y-4">
+        {/* Title and Artist */}
+        <div className="text-center">
+          <h3 className="font-medium text-lg">{currentTrack.title}</h3>
+          <p className="text-sm text-muted-foreground">Singer feat Singer</p>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="space-y-2">
+          <Slider
+            value={[currentTime]}
+            min={0}
+            max={duration || 100}
+            step={1}
+            onValueChange={handleTimeChange}
+            className="cursor-pointer"
+          />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(duration)}</span>
           </div>
         </div>
 
-        {/* Center section: Controls and Progress */}
-        <div className="flex flex-col items-center gap-3">
-          {/* Progress bar */}
-          <div className="flex items-center gap-2 w-full">
-            <span className="text-xs text-muted-foreground w-12 text-right">
-              {formatTime(currentTime)}
-            </span>
-            <Slider
-              className="flex-1"
-              value={[currentTime]}
-              min={0}
-              max={duration || 100}
-              step={1}
-              onValueChange={handleTimeChange}
-            />
-            <span className="text-xs text-muted-foreground w-12">
-              {formatTime(duration)}
-            </span>
-          </div>
-
-          {/* Main controls */}
-          <div className="flex items-center justify-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleLoop}
-              className={`h-8 w-8 ${isLooping ? "text-primary" : ""}`}
-              title="Toggle loop"
-            >
-              <Repeat className="h-4 w-4" />
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleSkipBack}
-              className="h-9 w-9"
-              title="Skip back 10 seconds"
-            >
-              <SkipBack className="h-4 w-4" />
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => isPlaying ? pauseTrack() : playTrack(currentTrack.url, currentTrack.title)}
-              className="h-11 w-11"
-            >
-              {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleSkipForward}
-              className="h-9 w-9"
-              title="Skip forward 10 seconds"
-            >
-              <SkipForward className="h-4 w-4" />
-            </Button>
-
-            <div className="flex items-center gap-2 ml-2">
-              <Volume2 className="h-4 w-4 text-muted-foreground" />
-              <Slider
-                className="w-20"
-                value={[volume]}
-                min={0}
-                max={1}
-                step={0.1}
-                onValueChange={(value) => {
-                  setVolume(value[0]);
-                  if (audioRef.current) {
-                    audioRef.current.volume = value[0];
-                  }
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Right section: Close button */}
-        <div className="flex justify-end">
+        {/* Controls */}
+        <div className="flex items-center justify-center gap-4">
           <Button
             variant="ghost"
             size="icon"
-            onClick={stopTrack}
-            className="h-8 w-8"
+            onClick={handleSkipBack}
+            className="h-10 w-10"
           >
-            <X className="h-4 w-4" />
+            <SkipBack className="h-6 w-6" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => isPlaying ? pauseTrack() : playTrack(currentTrack.url, currentTrack.title)}
+            className="h-14 w-14 bg-black text-white hover:bg-black/90 rounded-full"
+          >
+            {isPlaying ? 
+              <Pause className="h-8 w-8" /> : 
+              <Play className="h-8 w-8 ml-1" />
+            }
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleSkipForward}
+            className="h-10 w-10"
+          >
+            <SkipForward className="h-6 w-6" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsLiked(!isLiked)}
+            className="h-10 w-10 ml-4"
+          >
+            <Heart 
+              className={`h-6 w-6 ${isLiked ? 'fill-current text-red-500' : ''}`} 
+            />
           </Button>
         </div>
       </div>
