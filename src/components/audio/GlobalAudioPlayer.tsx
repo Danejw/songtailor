@@ -97,7 +97,6 @@ export function GlobalAudioPlayer() {
               </Button>
               <div>
                 <h3 className="font-medium text-sm">{currentTrack.title}</h3>
-                <p className="text-xs text-muted-foreground">Singer feat Singer</p>
               </div>
             </div>
             <div className="w-1/3">
@@ -116,7 +115,6 @@ export function GlobalAudioPlayer() {
             {/* Title and Artist */}
             <div className="text-center">
               <h3 className="font-medium text-lg">{currentTrack.title}</h3>
-              <p className="text-sm text-muted-foreground">Singer feat Singer</p>
             </div>
 
             {/* Progress Bar */}
