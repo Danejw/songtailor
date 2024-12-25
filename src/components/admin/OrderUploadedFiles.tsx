@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AudioWaveform, Image, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import type { Order, OrderSong } from "./types";
 
 interface OrderUploadedFilesProps {
@@ -27,14 +28,19 @@ export function OrderUploadedFiles({
   onDeleteCoverImage,
   isDeleting
 }: OrderUploadedFilesProps) {
+  const { toast } = useToast();
   const [deleteAudioId, setDeleteAudioId] = useState<string | null>(null);
   const [deleteCoverImage, setDeleteCoverImage] = useState<{ image: { id: string, file_path: string }, orderSongId: string } | null>(null);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const [failedAudio, setFailedAudio] = useState<Set<string>>(new Set());
 
   if (!order.order_songs?.length) {
     return null;
   }
 
   const getPublicUrl = (bucket: string, filePath: string) => {
+    if (!filePath) return '';
+    
     const fileName = filePath.split('/').pop();
     if (!fileName) return '';
     
@@ -43,6 +49,24 @@ export function OrderUploadedFiles({
       .getPublicUrl(fileName);
     
     return publicUrl;
+  };
+
+  const handleImageError = (filePath: string) => {
+    setFailedImages(prev => new Set([...prev, filePath]));
+    toast({
+      title: "Failed to load image",
+      description: "The image file could not be loaded",
+      variant: "destructive",
+    });
+  };
+
+  const handleAudioError = (filePath: string) => {
+    setFailedAudio(prev => new Set([...prev, filePath]));
+    toast({
+      title: "Failed to load audio",
+      description: "The audio file could not be loaded",
+      variant: "destructive",
+    });
   };
 
   const handleDeleteAudio = async () => {
@@ -70,12 +94,16 @@ export function OrderUploadedFiles({
             </h4>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {orderSong.song_url && (
+              {orderSong.song_url && !failedAudio.has(orderSong.song_url) && (
                 <div className="flex items-center gap-2 p-4 border rounded-lg">
                   <AudioWaveform className="w-5 h-5 text-blue-500" />
                   <div className="flex-1">
                     <p className="font-medium">Song File</p>
-                    <audio controls className="w-full mt-2">
+                    <audio 
+                      controls 
+                      className="w-full mt-2"
+                      onError={() => handleAudioError(orderSong.song_url!)}
+                    >
                       <source src={getPublicUrl('songs', orderSong.song_url)} type="audio/mpeg" />
                       Your browser does not support the audio element.
                     </audio>
@@ -91,7 +119,7 @@ export function OrderUploadedFiles({
                 </div>
               )}
               
-              {orderSong.cover_images && (
+              {orderSong.cover_images && !failedImages.has(orderSong.cover_images.file_path) && (
                 <div className="flex items-center gap-2 p-4 border rounded-lg">
                   <Image className="w-5 h-5 text-green-500" />
                   <div className="flex-1">
@@ -100,6 +128,7 @@ export function OrderUploadedFiles({
                       src={getPublicUrl('covers', orderSong.cover_images.file_path)} 
                       alt="Cover" 
                       className="w-full h-40 object-cover rounded-lg mt-2"
+                      onError={() => handleImageError(orderSong.cover_images!.file_path)}
                     />
                   </div>
                   <Button
@@ -113,6 +142,19 @@ export function OrderUploadedFiles({
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
+                </div>
+              )}
+
+              {/* Fallback messages */}
+              {orderSong.song_url && failedAudio.has(orderSong.song_url) && (
+                <div className="p-4 border rounded-lg bg-muted">
+                  <p className="text-muted-foreground">Audio file unavailable</p>
+                </div>
+              )}
+              
+              {orderSong.cover_images && failedImages.has(orderSong.cover_images.file_path) && (
+                <div className="p-4 border rounded-lg bg-muted">
+                  <p className="text-muted-foreground">Cover image unavailable</p>
                 </div>
               )}
             </div>
