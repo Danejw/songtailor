@@ -29,7 +29,7 @@ export interface Order {
   created_at: string;
   status: string;
   songs: Song | null;
-  profiles: Profile | null;
+  profiles?: Profile | null; // Made optional with ?
   amount: number;
   delivery_status: string | null;
   includes_both_versions: boolean | null;

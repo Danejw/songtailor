@@ -13,7 +13,7 @@ export function PurchasedContent() {
         .from('orders')
         .select(`
           *,
-          songs (
+          songs!fk_song (
             title,
             style,
             themes
