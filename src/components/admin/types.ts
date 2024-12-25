@@ -25,6 +25,7 @@ export interface OrderSong {
   is_primary: boolean;
   cover_images: CoverImage | null;
   is_public?: boolean;
+  created_at: string;
 }
 
 export interface OrderFormData {
@@ -45,6 +46,10 @@ export interface OrderFormData {
   wantSecondCoverImage: boolean;
 }
 
+export interface OrderMetadata {
+  formData: OrderFormData;
+}
+
 export interface Order {
   id: string;
   created_at: string;
@@ -55,12 +60,15 @@ export interface Order {
   delivery_status: string | null;
   includes_both_versions: boolean | null;
   includes_cover_image: boolean | null;
-  metadata: {
-    formData: OrderFormData;
-  } | null;
+  metadata: OrderMetadata | null;
   payment_intent_id: string | null;
   payment_status: string | null;
   song_id: string;
   user_id: string;
   order_songs: OrderSong[] | null;
+}
+
+// Type guard to check if metadata has formData
+export function hasFormData(metadata: any): metadata is OrderMetadata {
+  return metadata && typeof metadata === 'object' && 'formData' in metadata;
 }
