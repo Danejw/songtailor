@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAudio } from "@/components/audio/AudioContext";
 import type { OrderSong } from "@/components/admin/types";
 import { supabase } from "@/integrations/supabase/client";
+import { Play, Pause, Download, Image } from "lucide-react"; // Added missing imports
 
 interface OrderMediaDisplayProps {
   orderSong: OrderSong;
