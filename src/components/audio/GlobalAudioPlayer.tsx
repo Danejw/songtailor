@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAudio } from "./AudioContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
