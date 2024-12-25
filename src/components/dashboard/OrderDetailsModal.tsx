@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Eye } from "lucide-react";
+import { OrderMediaDisplay } from "./OrderMediaDisplay";
 
 interface OrderDetailsModalProps {
   order: any;
@@ -24,7 +25,7 @@ export const OrderDetailsModal: FC<OrderDetailsModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Eye className="w-5 h-5" />
@@ -32,7 +33,7 @@ export const OrderDetailsModal: FC<OrderDetailsModalProps> = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div>
             <h3 className="font-semibold mb-2">Song Information</h3>
             <div className="grid grid-cols-2 gap-2 text-sm">
@@ -44,6 +45,15 @@ export const OrderDetailsModal: FC<OrderDetailsModalProps> = ({
               <div>{order.songs?.themes || "Not specified"}</div>
             </div>
           </div>
+
+          {order.order_songs?.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="font-semibold">Song Files</h3>
+              {order.order_songs.map((orderSong: any) => (
+                <OrderMediaDisplay key={orderSong.id} orderSong={orderSong} />
+              ))}
+            </div>
+          )}
 
           <div>
             <h3 className="font-semibold mb-2">Order Information</h3>
