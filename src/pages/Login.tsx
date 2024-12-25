@@ -30,25 +30,51 @@ const Login = () => {
   }, [navigate, returnTo]);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center">
-      <div className="fixed inset-0 bg-gradient-to-br from-purple-100 via-white to-blue-100 grid-pattern -z-10" />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.1)_0%,rgba(255,255,255,0.8)_100%)] -z-10" />
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-[#9b87f5]/10 via-white to-[#7E69AB]/10">
+      {/* Decorative grid pattern overlay */}
+      <div className="absolute inset-0 bg-white/50 grid-pattern -z-10" />
+      
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/80 to-white/90 -z-10" />
+      
       <div className="container mx-auto px-4 py-8">
-        <div className="w-full max-w-md mx-auto space-y-4">
+        <div className="w-full max-w-md mx-auto space-y-6">
           {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          <Card className="backdrop-blur-sm bg-white/80">
-            <CardHeader>
-              <CardTitle className="text-center">Welcome to SongTailor</CardTitle>
+          
+          <Card className="backdrop-blur-sm bg-white/80 border-[#9b87f5]/20 shadow-lg shadow-[#9b87f5]/5">
+            <CardHeader className="space-y-3">
+              <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] bg-clip-text text-transparent">
+                Welcome to SongTailor
+              </CardTitle>
+              <p className="text-center text-muted-foreground">
+                Sign in to continue to your account
+              </p>
             </CardHeader>
             <CardContent>
               <Auth
                 supabaseClient={supabase}
-                appearance={{ theme: ThemeSupa }}
+                appearance={{
+                  theme: ThemeSupa,
+                  variables: {
+                    default: {
+                      colors: {
+                        brand: '#9b87f5',
+                        brandAccent: '#7E69AB',
+                      },
+                    },
+                  },
+                  className: {
+                    container: 'font-sans',
+                    button: 'font-medium',
+                    input: 'font-normal',
+                    label: 'font-medium text-sm text-gray-600',
+                  },
+                }}
                 theme="light"
                 providers={[]}
                 localization={{
@@ -59,7 +85,6 @@ const Login = () => {
                     },
                   },
                 }}
-                onlyThirdPartyProviders={false}
               />
             </CardContent>
           </Card>
