@@ -9,6 +9,7 @@ import { OrdersList } from "@/components/dashboard/OrdersList";
 import { LyricsReview } from "@/components/dashboard/LyricsReview";
 import { NotificationsPanel } from "@/components/dashboard/NotificationsPanel";
 import { DownloadSection } from "@/components/dashboard/DownloadSection";
+import { PurchasedContent } from "@/components/dashboard/PurchasedContent";
 import { Loader2 } from "lucide-react";
 
 export default function Dashboard() {
@@ -112,6 +113,8 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
         <div className="lg:col-span-2 space-y-6">
+          <PurchasedContent />
+          
           <Card>
             <CardHeader>
               <CardTitle>Active Orders</CardTitle>
@@ -131,7 +134,6 @@ export default function Dashboard() {
           </Card>
 
           <LyricsReview orders={activeOrders} />
-          <DownloadSection orders={completedOrders} />
         </div>
 
         <div className="space-y-6">
