@@ -76,7 +76,11 @@ export function GlobalAudioPlayer() {
   return (
     <Card className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-lg border-t z-50">
       <div className="container mx-auto flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4 flex-1">
+        <div className="w-1/4">
+          <p className="text-sm font-medium truncate">{currentTrack.title}</p>
+        </div>
+
+        <div className="flex-1 flex flex-col items-center gap-2">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -84,12 +88,13 @@ export function GlobalAudioPlayer() {
               onClick={handleSkipBack}
               title="Skip back 10 seconds"
             >
-              <SkipBack className="h-5 w-5" />
+              <SkipBack className="h-4 w-4" />
             </Button>
             
             <Button
               variant="ghost"
               size="icon"
+              className="h-10 w-10"
               onClick={() => isPlaying ? pauseTrack() : playTrack(currentTrack.url, currentTrack.title)}
             >
               {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
@@ -101,7 +106,7 @@ export function GlobalAudioPlayer() {
               onClick={handleSkipForward}
               title="Skip forward 10 seconds"
             >
-              <SkipForward className="h-5 w-5" />
+              <SkipForward className="h-4 w-4" />
             </Button>
 
             <Button
@@ -111,36 +116,29 @@ export function GlobalAudioPlayer() {
               className={isLooping ? "text-primary" : ""}
               title="Toggle loop"
             >
-              <Repeat className="h-5 w-5" />
+              <Repeat className="h-4 w-4" />
             </Button>
           </div>
-          
-          <div className="flex-1 space-y-1">
-            <p className="text-sm font-medium truncate">{currentTrack.title}</p>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">{formatTime(currentTime)}</span>
-              <Slider
-                className="flex-1"
-                value={[currentTime]}
-                min={0}
-                max={duration || 100}
-                step={1}
-                onValueChange={handleTimeChange}
-              />
-              <span className="text-xs text-muted-foreground">{formatTime(duration)}</span>
-            </div>
-            <audio
-              ref={audioRef}
-              src={currentTrack.url}
-              onEnded={() => stopTrack()}
-              className="hidden"
-            />
-          </div>
-        </div>
 
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Volume2 className="h-4 w-4 text-muted-foreground" />
+          <div className="w-full flex items-center gap-2">
+            <span className="text-xs text-muted-foreground w-12 text-right">
+              {formatTime(currentTime)}
+            </span>
+            <Slider
+              className="flex-1"
+              value={[currentTime]}
+              min={0}
+              max={duration || 100}
+              step={1}
+              onValueChange={handleTimeChange}
+            />
+            <span className="text-xs text-muted-foreground w-12">
+              {formatTime(duration)}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 mt-1">
+            <Volume2 className="h-3 w-3 text-muted-foreground" />
             <Slider
               className="w-24"
               value={[volume]}
@@ -155,11 +153,21 @@ export function GlobalAudioPlayer() {
               }}
             />
           </div>
-          
+
+          <audio
+            ref={audioRef}
+            src={currentTrack.url}
+            onEnded={() => stopTrack()}
+            className="hidden"
+          />
+        </div>
+
+        <div className="w-1/4 flex justify-end">
           <Button
             variant="ghost"
             size="icon"
             onClick={stopTrack}
+            className="h-8 w-8"
           >
             <X className="h-4 w-4" />
           </Button>
