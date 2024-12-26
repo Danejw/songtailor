@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import SongPurchaseForm from "./components/SongPurchaseForm";
 import PublicSongs from "./pages/PublicSongs";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/order" element={<SongPurchaseForm />} />
             <Route path="/public-songs" element={<PublicSongs />} />
+            <Route path="/terms" element={<Terms />} />
           </Routes>
           <GlobalAudioPlayer />
         </BrowserRouter>
