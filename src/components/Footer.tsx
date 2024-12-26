@@ -3,16 +3,18 @@ import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
-    <footer className="bg-[#1A1F2C] text-gray-200 py-16 border-t border-gray-800">
+    <footer className="bg-[#1A1F2C] text-gray-200 py-16">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+          {/* Brand Section */}
           <div>
-            <h3 className="text-2xl font-bold mb-4 text-white bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] bg-clip-text text-transparent">
+            <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] bg-clip-text text-transparent">
               SongTailor
             </h3>
             <p className="text-gray-400">Your Story, Your Song, Your Way</p>
           </div>
           
+          {/* Quick Links */}
           <div>
             <h4 className="font-semibold mb-6 text-white">Quick Links</h4>
             <ul className="space-y-3">
@@ -39,6 +41,7 @@ export const Footer = () => {
             </ul>
           </div>
           
+          {/* Legal Links */}
           <div>
             <h4 className="font-semibold mb-6 text-white">Legal</h4>
             <ul className="space-y-3">
@@ -60,6 +63,7 @@ export const Footer = () => {
             </ul>
           </div>
           
+          {/* Contact Information */}
           <div>
             <h4 className="font-semibold mb-6 text-white">Contact Us</h4>
             <div className="space-y-4">
@@ -86,6 +90,7 @@ export const Footer = () => {
           </div>
         </div>
         
+        {/* Copyright */}
         <div className="mt-12 pt-8 border-t border-gray-800 text-center">
           <p className="text-gray-500">
             &copy; {new Date().getFullYear()} SongTailor. All rights reserved.
