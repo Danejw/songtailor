@@ -14,6 +14,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import SongPurchaseForm from "./components/SongPurchaseForm";
 import PublicSongs from "./pages/PublicSongs";
 import Terms from "./pages/Terms";
+import RefundPolicy from "./pages/RefundPolicy";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/order" element={<SongPurchaseForm />} />
             <Route path="/public-songs" element={<PublicSongs />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/refund" element={<RefundPolicy />} />
           </Routes>
           <GlobalAudioPlayer />
         </BrowserRouter>
