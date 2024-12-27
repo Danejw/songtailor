@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { Menu, Music } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -66,6 +66,10 @@ export const Navigation = () => {
             <Link to="/pricing" className="text-gray-600 hover:text-purple-600">
               Pricing
             </Link>
+            <Link to="/public-songs" className="text-gray-600 hover:text-purple-600 flex items-center gap-2">
+              <Music className="h-4 w-4" />
+              Browse Songs
+            </Link>
             {isAuthenticated && (
               <Link to="/dashboard" className="text-gray-600 hover:text-purple-600">
                 Dashboard
@@ -104,6 +108,12 @@ export const Navigation = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/pricing" className="w-full">
                     Pricing
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/public-songs" className="w-full flex items-center gap-2">
+                    <Music className="h-4 w-4" />
+                    Browse Songs
                   </Link>
                 </DropdownMenuItem>
                 {isAuthenticated && (
