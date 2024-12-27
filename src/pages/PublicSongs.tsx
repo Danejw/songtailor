@@ -44,8 +44,9 @@ const PublicSongs = () => {
       
       return data || [];
     },
-    retry: false, // Don't retry on failure
-    refetchOnWindowFocus: false, // Don't refetch when window gains focus
+    retry: false,
+    refetchOnWindowFocus: false,
+    // Remove any auth requirements from the query configuration
   });
 
   const getSongTitle = (song: any) => {
