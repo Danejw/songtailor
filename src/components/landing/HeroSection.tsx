@@ -20,7 +20,7 @@ export const HeroSection = () => {
         <h1 className="text-5xl md:text-7xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 leading-tight animate-gradient tracking-tight">
           Turn Your Stories Into<br />Stunning Songs!
         </h1>
-        <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed animate-fade-in">
+        <p className="text-xl md:text-2xl text-gray-600 mb-18 max-w-2xl mx-auto leading-relaxed animate-fade-in">
           Custom songs crafted for your unique moments, bringing your stories to life through music
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
