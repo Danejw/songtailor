@@ -19,15 +19,17 @@ const PublicSongs = () => {
           is_primary,
           is_public,
           created_at,
-          orders (
+          orders!inner (
+            id,
             metadata,
-            songs (
+            songs!inner (
+              id,
               title,
               style,
               themes
             )
           ),
-          cover_images (
+          cover_images!left (
             id,
             file_path
           )
@@ -35,17 +37,23 @@ const PublicSongs = () => {
         .eq('is_public', true)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching public songs:', error);
+        throw error;
+      }
       
       return data || [];
     },
   });
 
   const getSongTitle = (song: any) => {
-    if (song.orders?.songs?.title) return song.orders.songs.title;
-    if (song.orders?.metadata?.formData?.songTitle) return song.orders.metadata.formData.songTitle;
+    const orderMetadata = song.orders?.metadata?.formData;
+    const songData = song.orders?.songs;
+    
+    if (songData?.title) return songData.title;
+    if (orderMetadata?.songTitle) return orderMetadata.songTitle;
+    
     if (song.song_url) {
-      // Extract filename without extension as fallback
       const fileName = song.song_url.split('/').pop()?.split('.')[0] || "Untitled Song";
       return fileName
         .replace(/[_-]/g, ' ')
@@ -55,8 +63,11 @@ const PublicSongs = () => {
   };
 
   const getSongDetails = (song: any) => {
-    const style = song.orders?.songs?.style || song.orders?.metadata?.formData?.musicStyle || "Unknown Style";
-    const theme = song.orders?.songs?.themes || song.orders?.metadata?.formData?.theme || "Various Themes";
+    const songData = song.orders?.songs;
+    const orderMetadata = song.orders?.metadata?.formData;
+    
+    const style = songData?.style || orderMetadata?.musicStyle || "Unknown Style";
+    const theme = songData?.themes || orderMetadata?.theme || "Various Themes";
     return { style, theme };
   };
 
