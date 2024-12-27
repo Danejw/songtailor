@@ -9,9 +9,11 @@ import type { OrderSong } from "@/components/admin/types";
 interface PublicSongCardProps {
   song: OrderSong;
   title: string;
+  style: string;
+  theme: string;
 }
 
-export function PublicSongCard({ song, title }: PublicSongCardProps) {
+export function PublicSongCard({ song, title, style, theme }: PublicSongCardProps) {
   const [audioUrl, setAudioUrl] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
@@ -61,7 +63,7 @@ export function PublicSongCard({ song, title }: PublicSongCardProps) {
           <div className="relative overflow-hidden rounded-lg">
             <img
               src={imageUrl}
-              alt="Song cover"
+              alt={`Cover for ${title}`}
               className="w-full h-48 object-cover rounded-lg transform group-hover:scale-105 transition-transform duration-700"
               onError={() => setImageUrl("")}
             />
@@ -89,7 +91,7 @@ export function PublicSongCard({ song, title }: PublicSongCardProps) {
           </div>
         ) : (
           <div className="w-full h-48 bg-gradient-to-br from-[#9b87f5]/5 to-[#7E69AB]/5 rounded-lg flex items-center justify-center group-hover:from-[#9b87f5]/10 group-hover:to-[#7E69AB]/10 transition-colors duration-500">
-            <ImageIcon className="w-16 h-16 text-[#9b87f5]/20 group-hover:scale-110 transition-transform duration-500" />
+            <Music className="w-16 h-16 text-[#9b87f5]/20 group-hover:scale-110 transition-transform duration-500" />
           </div>
         )}
         
@@ -97,6 +99,9 @@ export function PublicSongCard({ song, title }: PublicSongCardProps) {
           <h3 className="font-medium text-lg text-primary/90 group-hover:text-primary truncate">
             {title}
           </h3>
+          <p className="text-sm text-muted-foreground/80">
+            {style} • {theme}
+          </p>
           
           {audioUrl && (
             <Button

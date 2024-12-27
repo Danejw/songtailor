@@ -19,34 +19,45 @@ const PublicSongs = () => {
           is_primary,
           is_public,
           created_at,
+          orders (
+            metadata,
+            songs (
+              title,
+              style,
+              themes
+            )
+          ),
           cover_images (
             id,
             file_path
           )
         `)
-        .eq('is_public', true);
+        .eq('is_public', true)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       
-      // Transform the data to match our OrderSong type
-      return (data || []).map(song => ({
-        ...song,
-        cover_images: song.cover_images ? {
-          id: song.cover_images.id,
-          file_path: song.cover_images.file_path
-        } : null
-      })) as OrderSong[];
+      return data || [];
     },
   });
 
-  const getSongTitle = (songUrl: string | null) => {
-    if (!songUrl) return "Untitled Song";
-    // Extract filename without extension
-    const fileName = songUrl.split('/').pop()?.split('.')[0] || "Untitled Song";
-    // Convert underscores/dashes to spaces and capitalize words
-    return fileName
-      .replace(/[_-]/g, ' ')
-      .replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+  const getSongTitle = (song: any) => {
+    if (song.orders?.songs?.title) return song.orders.songs.title;
+    if (song.orders?.metadata?.formData?.songTitle) return song.orders.metadata.formData.songTitle;
+    if (song.song_url) {
+      // Extract filename without extension as fallback
+      const fileName = song.song_url.split('/').pop()?.split('.')[0] || "Untitled Song";
+      return fileName
+        .replace(/[_-]/g, ' ')
+        .replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+    }
+    return "Untitled Song";
+  };
+
+  const getSongDetails = (song: any) => {
+    const style = song.orders?.songs?.style || song.orders?.metadata?.formData?.musicStyle || "Unknown Style";
+    const theme = song.orders?.songs?.themes || song.orders?.metadata?.formData?.theme || "Various Themes";
+    return { style, theme };
   };
 
   return (
@@ -58,7 +69,7 @@ const PublicSongs = () => {
         <div className="absolute inset-0 grid-pattern opacity-10" />
         <div className="container mx-auto px-4 text-center relative">
           <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-[#9b87f5] via-[#8B5CF6] to-[#7E69AB] bg-clip-text text-transparent mb-6 animate-fade-in">
-            Public Songs
+            Browse Songs
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto animate-fade-in delay-100">
             Discover and listen to our collection of publicly shared songs
@@ -86,13 +97,18 @@ const PublicSongs = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
-            {publicSongs.map((song) => (
-              <PublicSongCard
-                key={song.id}
-                song={song}
-                title={getSongTitle(song.song_url)}
-              />
-            ))}
+            {publicSongs.map((song) => {
+              const { style, theme } = getSongDetails(song);
+              return (
+                <PublicSongCard
+                  key={song.id}
+                  song={song}
+                  title={getSongTitle(song)}
+                  style={style}
+                  theme={theme}
+                />
+              );
+            })}
           </div>
         )}
       </main>
