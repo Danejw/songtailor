@@ -7,7 +7,7 @@ import { Music, Loader2 } from "lucide-react";
 import type { OrderSong } from "@/components/admin/types";
 
 const PublicSongs = () => {
-  const { data: publicSongs, isLoading } = useQuery({
+  const { data: publicSongs, isLoading, error } = useQuery({
     queryKey: ['publicSongs'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -22,7 +22,7 @@ const PublicSongs = () => {
           orders!inner (
             id,
             metadata,
-            songs!inner (
+            songs!fk_song (
               id,
               title,
               style,
@@ -44,6 +44,8 @@ const PublicSongs = () => {
       
       return data || [];
     },
+    retry: false, // Don't retry on failure
+    refetchOnWindowFocus: false, // Don't refetch when window gains focus
   });
 
   const getSongTitle = (song: any) => {
@@ -96,6 +98,15 @@ const PublicSongs = () => {
               <div className="absolute inset-0 blur-lg bg-[#9b87f5]/30 animate-pulse" />
             </div>
             <p className="text-lg text-muted-foreground animate-pulse">Loading songs...</p>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6 animate-fade-in">
+            <div className="relative">
+              <Music className="h-24 w-24 text-muted-foreground/30" />
+              <div className="absolute inset-0 blur-xl bg-[#9b87f5]/10 animate-pulse" />
+            </div>
+            <p className="text-2xl font-semibold text-muted-foreground">Unable to load songs</p>
+            <p className="text-muted-foreground">Please try again later</p>
           </div>
         ) : !publicSongs?.length ? (
           <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6 animate-fade-in">
