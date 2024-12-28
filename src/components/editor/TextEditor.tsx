@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Eye, Edit2, Loader2, ChevronUp, ChevronDown } from "lucide-react";
+import { Eye, Edit2, Loader2, ChevronUp, ChevronDown, Copy, Check } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface TextEditorProps {
   title?: string;
@@ -35,10 +36,12 @@ export function TextEditor({
   onModeChange,
   onContentChange,
 }: TextEditorProps) {
+  const { toast } = useToast();
   const [content, setContent] = useState(initialContent);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(true);
+  const [hasCopied, setHasCopied] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleModeToggle = () => {
@@ -61,6 +64,24 @@ export function TextEditor({
       setIsEditing(false);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setHasCopied(true);
+      toast({
+        title: "Copied!",
+        description: "Lyrics copied to clipboard",
+      });
+      setTimeout(() => setHasCopied(false), 2000);
+    } catch (err) {
+      toast({
+        title: "Failed to copy",
+        description: "Please try again",
+        variant: "destructive",
+      });
     }
   };
 
@@ -90,39 +111,58 @@ export function TextEditor({
     <Card className={className}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <CardTitle>{title}</CardTitle>
-        {isEditable && (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowQuickActions(!showQuickActions)}
-            >
-              {showQuickActions ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleModeToggle}
-              disabled={isSaving}
-            >
-              {isEditing ? (
-                <>
-                  <Eye className="h-4 w-4 mr-2" />
-                  View Mode
-                </>
-              ) : (
-                <>
-                  <Edit2 className="h-4 w-4 mr-2" />
-                  Edit Mode
-                </>
-              )}
-            </Button>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={copyToClipboard}
+          >
+            {hasCopied ? (
+              <>
+                <Check className="h-4 w-4 mr-2" />
+                Copied
+              </>
+            ) : (
+              <>
+                <Copy className="h-4 w-4 mr-2" />
+                Copy
+              </>
+            )}
+          </Button>
+          {isEditable && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowQuickActions(!showQuickActions)}
+              >
+                {showQuickActions ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleModeToggle}
+                disabled={isSaving}
+              >
+                {isEditing ? (
+                  <>
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Mode
+                  </>
+                ) : (
+                  <>
+                    <Edit2 className="h-4 w-4 mr-2" />
+                    Edit Mode
+                  </>
+                )}
+              </Button>
+            </>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="w-full rounded-md border">
