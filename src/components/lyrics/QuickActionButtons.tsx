@@ -3,12 +3,13 @@ import { ChevronUp, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 const SECTION_MARKERS = [
+  "Intro",
   "Verse",
   "Chorus",
   "Bridge",
-  "Instrumental",
+  "Verse",
   "Outro",
-  "Intro"
+  "Instrumental"
 ] as const;
 
 interface QuickActionButtonsProps {
@@ -36,9 +37,9 @@ export function QuickActionButtons({ onInsertSection }: QuickActionButtonsProps)
       
       {showQuickActions && (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {SECTION_MARKERS.map((section) => (
+          {SECTION_MARKERS.map((section, index) => (
             <Button
-              key={section}
+              key={`${section}-${index}`}
               variant="outline"
               size="sm"
               onClick={() => onInsertSection(section)}
