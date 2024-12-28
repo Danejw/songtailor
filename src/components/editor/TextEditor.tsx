@@ -15,12 +15,12 @@ interface TextEditorProps {
 }
 
 const SECTION_MARKERS = [
+  "Intro",
   "Verse",
   "Chorus",
   "Bridge",
   "Instrumental",
-  "Outro",
-  "Intro"
+  "Outro"
 ] as const;
 
 export function TextEditor({
