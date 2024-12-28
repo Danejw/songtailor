@@ -58,20 +58,11 @@ serve(async (req) => {
       throw new Error('Admin access required');
     }
 
-    // Fetch order song data
+    // First, get the order_song and its order_id
     console.log('Fetching order song data...');
     const { data: orderSong, error: orderSongError } = await supabaseClient
       .from('order_songs')
-      .select(`
-        *,
-        orders!order_songs_order_id_fkey (
-          metadata,
-          songs!inner (
-            style,
-            themes
-          )
-        )
-      `)
+      .select('id, lyrics, order_id')
       .eq('id', orderSongId)
       .single();
 
@@ -85,16 +76,40 @@ serve(async (req) => {
       throw new Error('Order song not found');
     }
 
-    console.log('Successfully fetched order song data:', {
-      id: orderSong.id,
-      style: orderSong.orders?.songs?.style,
-      themes: orderSong.orders?.songs?.themes
+    // Then, get the order and song details
+    const { data: order, error: orderError } = await supabaseClient
+      .from('orders')
+      .select(`
+        metadata,
+        songs (
+          style,
+          themes,
+          id
+        )
+      `)
+      .eq('id', orderSong.order_id)
+      .single();
+
+    if (orderError) {
+      console.error('Error fetching order:', orderError);
+      throw new Error(`Order fetch error: ${orderError.message}`);
+    }
+
+    if (!order || !order.songs) {
+      console.error('Order or song data not found');
+      throw new Error('Order data not found');
+    }
+
+    console.log('Successfully fetched data:', {
+      orderSongId: orderSong.id,
+      style: order.songs.style,
+      themes: order.songs.themes
     });
 
     // Prepare context for OpenAI
-    const metadata = orderSong.orders?.metadata as Record<string, any> || {};
-    const songStyle = orderSong.orders?.songs?.style || '';
-    const themes = orderSong.orders?.songs?.themes || '';
+    const metadata = order.metadata as Record<string, any> || {};
+    const songStyle = order.songs.style || '';
+    const themes = order.songs.themes || '';
     const existingLyrics = currentLyrics || orderSong.lyrics || '';
 
     // Construct the prompt for OpenAI
@@ -126,7 +141,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4',
         messages: [
           { role: 'system', content: 'You are a professional songwriter with expertise in various musical styles.' },
           { role: 'user', content: prompt }
@@ -156,7 +171,7 @@ serve(async (req) => {
       supabaseClient
         .from('songs')
         .update({ lyrics: generatedLyrics })
-        .eq('id', orderSong.orders.songs.id)
+        .eq('id', order.songs.id)
     ]);
 
     if (orderSongUpdate.error) {
