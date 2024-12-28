@@ -16,6 +16,7 @@ import PublicSongs from "./pages/PublicSongs";
 import Terms from "./pages/Terms";
 import RefundPolicy from "./pages/RefundPolicy";
 import Privacy from "./pages/Privacy";
+import LyricsEditor from "./pages/LyricsEditor";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/terms" element={<Terms />} />
             <Route path="/refund" element={<RefundPolicy />} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/lyrics/:id" element={<LyricsEditor />} />
           </Routes>
           <GlobalAudioPlayer />
         </BrowserRouter>
