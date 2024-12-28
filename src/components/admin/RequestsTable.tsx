@@ -36,22 +36,22 @@ const fetchOrdersWithDetails = async (): Promise<Order[]> => {
     }
   }
 
-  // First, get the user profiles
   const { data: profiles } = await supabase
     .from('profiles')
     .select('id, email');
 
-  // Then fetch orders with related data
   const { data: ordersData, error: ordersError } = await supabase
     .from('orders')
     .select(`
       *,
       songs!fk_song (
+        id,
         title,
         style,
         lyrics,
         themes,
-        reference_links
+        reference_links,
+        status
       ),
       order_songs (
         id,
@@ -72,11 +72,10 @@ const fetchOrdersWithDetails = async (): Promise<Order[]> => {
     throw ordersError;
   }
 
-  // Transform the data to match our Order type
-  const ordersWithProfiles = ordersData?.map(order => ({
+  const ordersWithProfiles = (ordersData || []).map(order => ({
     ...order,
     profiles: profiles?.find(profile => profile.id === order.user_id) || null,
-    order_songs: order.order_songs || null,
+    order_songs: order.order_songs || [],
     metadata: convertToOrderMetadata(order.metadata)
   })) as Order[];
 

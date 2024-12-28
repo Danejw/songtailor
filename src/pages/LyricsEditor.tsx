@@ -78,7 +78,13 @@ export default function LyricsEditor() {
 
       if (error) throw error;
 
-      setOrders(ordersData || []);
+      // Convert the raw data to match our Order type
+      const typedOrders: Order[] = (ordersData || []).map(order => ({
+        ...order,
+        metadata: order.metadata ? convertToOrderMetadata(order.metadata) : undefined
+      }));
+
+      setOrders(typedOrders);
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast({
