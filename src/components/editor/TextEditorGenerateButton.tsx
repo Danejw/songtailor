@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Wand2, Loader2 } from "lucide-react";
+import { Magic, Loader2 } from "lucide-react";
 
 interface TextEditorGenerateButtonProps {
   isGenerating: boolean;
@@ -23,7 +23,7 @@ export function TextEditorGenerateButton({
       {isGenerating ? (
         <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
-        <Wand2 className="h-4 w-4" />
+        <Magic className="h-4 w-4" />
       )}
     </Button>
   );
