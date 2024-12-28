@@ -121,12 +121,12 @@ export function TextEditor({
         )}
       </CardHeader>
       <CardContent className="space-y-4">
-        <ScrollArea className="h-[calc(100vh-400px)] min-h-[300px] w-full rounded-md border">
+        <ScrollArea className="relative h-[60vh] w-full rounded-md border">
           <Textarea
             ref={textareaRef}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="min-h-full border-none focus-visible:ring-0 resize-none"
+            className="absolute inset-0 min-h-full w-full border-none focus-visible:ring-0 resize-none"
             placeholder={placeholder}
             readOnly={!isEditing}
           />
