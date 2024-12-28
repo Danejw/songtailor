@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { TextEditor } from "@/components/editor/TextEditor";
 import { AdminOrderSelector } from "@/components/admin/lyrics/AdminOrderSelector";
+import { AdminLyricsHeader } from "@/components/admin/lyrics/AdminLyricsHeader";
+import { useLyricsGeneration } from "@/components/admin/lyrics/useLyricsGeneration";
 import type { Order } from "@/components/admin/types";
 import { convertToOrderMetadata } from "@/components/admin/types";
 
@@ -16,6 +18,7 @@ export default function AdminLyricsEditor() {
   const [selectedOrderSongId, setSelectedOrderSongId] = useState<string | null>(null);
   const [lyrics, setLyrics] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const { isGenerating, generateLyrics } = useLyricsGeneration();
 
   useEffect(() => {
     checkAdminAuth();
@@ -139,6 +142,15 @@ export default function AdminLyricsEditor() {
     }
   };
 
+  const handleGenerateLyrics = async () => {
+    if (!selectedOrderSongId) return;
+    
+    const generatedLyrics = await generateLyrics(selectedOrderSongId, lyrics);
+    if (generatedLyrics) {
+      setLyrics(generatedLyrics);
+    }
+  };
+
   const handleSave = async (newLyrics: string) => {
     if (!selectedOrderSongId) return;
 
@@ -203,13 +215,19 @@ export default function AdminLyricsEditor() {
       />
 
       {selectedOrderSongId && (
-        <TextEditor
-          title="Song Lyrics"
-          initialContent={lyrics}
-          isEditable={true}
-          placeholder="No lyrics available"
-          onSave={handleSave}
-        />
+        <>
+          <AdminLyricsHeader
+            isGenerating={isGenerating}
+            onGenerateLyrics={handleGenerateLyrics}
+          />
+          <TextEditor
+            title="Song Lyrics"
+            initialContent={lyrics}
+            isEditable={true}
+            placeholder="No lyrics available"
+            onSave={handleSave}
+          />
+        </>
       )}
     </div>
   );
