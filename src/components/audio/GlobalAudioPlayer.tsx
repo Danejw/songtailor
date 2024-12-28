@@ -12,38 +12,66 @@ export function GlobalAudioPlayer() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     if (audioRef.current) {
       if (isPlaying) {
-        audioRef.current.play();
+        audioRef.current.play().catch(error => {
+          console.error("Error playing audio:", error);
+          pauseTrack();
+        });
       } else {
         audioRef.current.pause();
       }
     }
-  }, [isPlaying, currentTrack]);
+  }, [isPlaying, currentTrack, pauseTrack]);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const updateTime = () => setCurrentTime(audio.currentTime);
-    const handleLoadedMetadata = () => setDuration(audio.duration);
+    const updateTime = () => {
+      if (!isDragging) {
+        setCurrentTime(audio.currentTime);
+      }
+    };
+
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration);
+      setCurrentTime(0);
+    };
+
+    const handleEnded = () => {
+      stopTrack();
+      setCurrentTime(0);
+    };
 
     audio.addEventListener('timeupdate', updateTime);
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('ended', handleEnded);
 
     return () => {
       audio.removeEventListener('timeupdate', updateTime);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('ended', handleEnded);
     };
-  }, []);
+  }, [isDragging, stopTrack]);
 
   const handleTimeChange = (value: number[]) => {
     if (audioRef.current) {
-      audioRef.current.currentTime = value[0];
-      setCurrentTime(value[0]);
+      const newTime = value[0];
+      setCurrentTime(newTime);
+      audioRef.current.currentTime = newTime;
     }
+  };
+
+  const handleSliderDragStart = () => {
+    setIsDragging(true);
+  };
+
+  const handleSliderDragEnd = () => {
+    setIsDragging(false);
   };
 
   const formatTime = (time: number) => {
@@ -106,18 +134,18 @@ export function GlobalAudioPlayer() {
                 max={duration || 100}
                 step={1}
                 onValueChange={handleTimeChange}
+                onPointerDown={handleSliderDragStart}
+                onPointerUp={handleSliderDragEnd}
                 className="cursor-pointer"
               />
             </div>
           </div>
         ) : (
           <div className="space-y-4">
-            {/* Title */}
             <div className="text-center">
               <h3 className="font-medium text-lg">{currentTrack.title}</h3>
             </div>
 
-            {/* Progress Bar */}
             <div className="space-y-2">
               <Slider
                 value={[currentTime]}
@@ -125,6 +153,8 @@ export function GlobalAudioPlayer() {
                 max={duration || 100}
                 step={1}
                 onValueChange={handleTimeChange}
+                onPointerDown={handleSliderDragStart}
+                onPointerUp={handleSliderDragEnd}
                 className="cursor-pointer"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
@@ -133,7 +163,6 @@ export function GlobalAudioPlayer() {
               </div>
             </div>
 
-            {/* Controls */}
             <div className="flex items-center justify-center gap-4">
               <Button
                 variant="ghost"
