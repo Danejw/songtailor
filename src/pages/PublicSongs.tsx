@@ -19,7 +19,7 @@ const PublicSongs = () => {
           is_primary,
           is_public,
           created_at,
-          orders (
+          orders!order_songs_order_id_fkey (
             id,
             metadata,
             songs!fk_song (
@@ -29,7 +29,7 @@ const PublicSongs = () => {
               themes
             )
           ),
-          cover_images (
+          cover_images!cover_images_order_song_id_fkey (
             id,
             file_path
           )
