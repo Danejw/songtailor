@@ -98,6 +98,8 @@ serve(async (req) => {
       prompt += `\nAdditional Instructions: ${customPrompt}`;
     }
 
+    console.log('Sending request to OpenAI with prompt:', prompt);
+
     // Call OpenAI API
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -106,7 +108,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: 'You are a professional songwriter with expertise in various musical styles.' },
           { role: 'user', content: prompt }
@@ -115,8 +117,16 @@ serve(async (req) => {
       }),
     });
 
+    if (!openAIResponse.ok) {
+      const errorData = await openAIResponse.json();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+    }
+
     const openAIData = await openAIResponse.json();
     const generatedLyrics = openAIData.choices[0].message.content;
+
+    console.log('Successfully generated lyrics');
 
     // Update both order_songs and songs tables
     const [orderSongUpdate, songUpdate] = await Promise.all([
@@ -133,6 +143,8 @@ serve(async (req) => {
 
     if (orderSongUpdate.error) throw orderSongUpdate.error;
     if (songUpdate.error) throw songUpdate.error;
+
+    console.log('Successfully updated database with new lyrics');
 
     // Return the generated lyrics
     return new Response(
