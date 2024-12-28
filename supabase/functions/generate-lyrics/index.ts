@@ -76,12 +76,12 @@ serve(async (req) => {
       throw new Error('Order song not found');
     }
 
-    // Then, get the order and song details
+    // Then, get the order and song details using the explicit foreign key relationship
     const { data: order, error: orderError } = await supabaseClient
       .from('orders')
       .select(`
         metadata,
-        songs (
+        songs!fk_song (
           style,
           themes,
           id
