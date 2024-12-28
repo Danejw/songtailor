@@ -22,7 +22,7 @@ const PublicSongs = () => {
           orders (
             id,
             metadata,
-            songs!fk_song (
+            songs (
               id,
               title,
               style,
@@ -49,8 +49,8 @@ const PublicSongs = () => {
   });
 
   const getSongTitle = (song: any) => {
-    const orderMetadata = song.orders?.metadata?.formData;
     const songData = song.orders?.songs;
+    const orderMetadata = song.orders?.metadata?.formData;
     
     if (songData?.title) return songData.title;
     if (orderMetadata?.songTitle) return orderMetadata.songTitle;
