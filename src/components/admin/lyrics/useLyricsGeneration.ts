@@ -11,12 +11,13 @@ export function useLyricsGeneration() {
       setIsGenerating(true);
       console.log('Invoking generate-lyrics function with:', { orderSongId, currentLyrics, additionalPrompt });
       
+      // Make sure we're passing a proper object structure
       const { data, error } = await supabase.functions.invoke('generate-lyrics', {
-        body: { 
+        body: JSON.stringify({ 
           orderSongId, 
           currentLyrics, 
           additionalPrompt 
-        }
+        })
       });
 
       if (error) {
@@ -25,8 +26,11 @@ export function useLyricsGeneration() {
       }
 
       if (!data?.lyrics) {
+        console.error('No lyrics data returned:', data);
         throw new Error('No lyrics returned from the function');
       }
+
+      console.log('Successfully generated lyrics:', data.lyrics);
 
       toast({
         title: "Success",
