@@ -19,7 +19,7 @@ const PublicSongs = () => {
           is_primary,
           is_public,
           created_at,
-          orders!inner (
+          orders (
             id,
             metadata,
             songs!fk_song (
@@ -29,7 +29,7 @@ const PublicSongs = () => {
               themes
             )
           ),
-          cover_images!left (
+          cover_images (
             id,
             file_path
           )
@@ -46,7 +46,6 @@ const PublicSongs = () => {
     },
     retry: false,
     refetchOnWindowFocus: false,
-    // Remove any auth requirements from the query configuration
   });
 
   const getSongTitle = (song: any) => {
