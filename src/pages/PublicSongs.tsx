@@ -10,6 +10,8 @@ const PublicSongs = () => {
   const { data: publicSongs, isLoading, error } = useQuery({
     queryKey: ['publicSongs'],
     queryFn: async () => {
+      console.log('Fetching public songs...');
+      
       const { data, error } = await supabase
         .from('order_songs')
         .select(`
@@ -41,10 +43,11 @@ const PublicSongs = () => {
         console.error('Error fetching public songs:', error);
         throw error;
       }
-      
+
+      console.log('Public songs fetched successfully:', data);
       return data || [];
     },
-    retry: false,
+    retry: 1,
     refetchOnWindowFocus: false,
   });
 
