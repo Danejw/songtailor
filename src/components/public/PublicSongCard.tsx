@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Music, Image as ImageIcon, Play, Pause, AlertCircle } from "lucide-react";
+import { Music, Play, Pause, AlertCircle } from "lucide-react";
 import { FileUrlManager } from "@/components/admin/files/FileUrlManager";
 import { useAudio } from "@/components/audio/AudioContext";
 import { useToast } from "@/hooks/use-toast";
@@ -73,19 +73,6 @@ export function PublicSongCard({ song, title, style, theme }: PublicSongCardProp
   }, [song, toast]);
 
   const isCurrentlyPlaying = currentTrack?.songId === song.id && isPlaying;
-
-  if (isLoading) {
-    return (
-      <Card className="overflow-hidden hover:shadow-lg transition-all duration-500 bg-white/80 backdrop-blur-sm border-[#9b87f5]/10">
-        <CardContent className="p-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-48 bg-gradient-to-br from-[#9b87f5]/5 to-[#7E69AB]/5 rounded-lg" />
-            <div className="h-10 bg-gradient-to-r from-[#9b87f5]/5 to-[#7E69AB]/5 rounded-lg" />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   const handlePlayPause = () => {
     if (!audioUrl || hasAudioError) {
