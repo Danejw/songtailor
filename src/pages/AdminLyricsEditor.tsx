@@ -143,10 +143,10 @@ export default function AdminLyricsEditor() {
     }
   };
 
-  const handleGenerateLyrics = async () => {
-    if (!selectedOrderSongId || !isEditing) return;
+  const handleGenerateLyrics = async (additionalPrompt: string) => {
+    if (!selectedOrderSongId) return;
     
-    const generatedLyrics = await generateLyrics(selectedOrderSongId, lyrics);
+    const generatedLyrics = await generateLyrics(selectedOrderSongId, lyrics, additionalPrompt);
     if (generatedLyrics) {
       setLyrics(generatedLyrics);
     }

@@ -1,9 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { LyricsPromptInput } from "./LyricsPromptInput";
 
 interface AdminLyricsHeaderProps {
   isGenerating: boolean;
-  onGenerateLyrics: () => void;
+  onGenerateLyrics: (prompt: string) => void;
   isEditing: boolean;
 }
 
@@ -13,21 +12,10 @@ export function AdminLyricsHeader({
   isEditing 
 }: AdminLyricsHeaderProps) {
   return (
-    <div className="flex justify-end gap-2 mb-4">
-      <Button
-        variant="outline"
-        onClick={onGenerateLyrics}
-        disabled={isGenerating || !isEditing}
-      >
-        {isGenerating ? (
-          <>
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            Generating...
-          </>
-        ) : (
-          "Generate Lyrics"
-        )}
-      </Button>
-    </div>
+    <LyricsPromptInput
+      isGenerating={isGenerating}
+      onGenerateLyrics={onGenerateLyrics}
+      isEditing={isEditing}
+    />
   );
 }

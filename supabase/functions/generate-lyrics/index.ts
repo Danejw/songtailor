@@ -10,6 +10,7 @@ const corsHeaders = {
 interface RequestBody {
   orderSongId: string;
   currentLyrics?: string;
+  additionalPrompt?: string;
 }
 
 serve(async (req) => {
@@ -25,7 +26,7 @@ serve(async (req) => {
     );
 
     // Get request data
-    const { orderSongId, currentLyrics } = await req.json() as RequestBody;
+    const { orderSongId, currentLyrics, additionalPrompt } = await req.json() as RequestBody;
     console.log('Received request for orderSongId:', orderSongId);
 
     // Verify admin status
@@ -123,6 +124,11 @@ serve(async (req) => {
       if (metadata.formData) {
         prompt += `Additional Context: ${JSON.stringify(metadata.formData)}\n`;
       }
+    }
+
+    // Add the additional prompt if provided
+    if (additionalPrompt) {
+      prompt += `\nAdditional Context from User: ${additionalPrompt}\n`;
     }
 
     prompt += `\nRequirements:

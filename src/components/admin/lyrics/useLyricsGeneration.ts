@@ -6,12 +6,12 @@ export function useLyricsGeneration() {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
-  const generateLyrics = async (orderSongId: string, currentLyrics?: string) => {
+  const generateLyrics = async (orderSongId: string, currentLyrics?: string, additionalPrompt?: string) => {
     try {
       setIsGenerating(true);
       
       const { data, error } = await supabase.functions.invoke('generate-lyrics', {
-        body: { orderSongId, currentLyrics }
+        body: { orderSongId, currentLyrics, additionalPrompt }
       });
 
       if (error) throw error;
