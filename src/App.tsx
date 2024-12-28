@@ -17,6 +17,7 @@ import Terms from "./pages/Terms";
 import RefundPolicy from "./pages/RefundPolicy";
 import Privacy from "./pages/Privacy";
 import LyricsEditor from "./pages/LyricsEditor";
+import AdminLyricsEditor from "./pages/AdminLyricsEditor";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/lyrics" element={<AdminLyricsEditor />} />
             <Route path="/order" element={<SongPurchaseForm />} />
             <Route path="/public-songs" element={<PublicSongs />} />
             <Route path="/terms" element={<Terms />} />
