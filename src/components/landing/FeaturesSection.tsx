@@ -1,4 +1,4 @@
-import { Music, Heart, Star, Sparkles } from "lucide-react";
+import { Music, Heart, Sparkles, Stars } from "lucide-react";
 
 export const FeaturesSection = () => {
   return (
@@ -17,12 +17,22 @@ export const FeaturesSection = () => {
             We combine creativity with expertise to deliver songs that capture your unique story
           </p>
         </div>
-        <div className="grid md:grid-cols-1 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           {[
             {
               icon: Heart,
               title: "Personalized Touch",
               description: "Every song is uniquely crafted to tell your story"
+            },
+            {
+              icon: Stars,
+              title: "Exceptional Quality",
+              description: "We deliver professionally crafted songs that are polished and unforgettable"
+            },
+            {
+              icon: Music,
+              title: "Tailored Versatility",
+              description: "We create songs in any genre to match your unique vision"
             }
           ].map((feature, index) => (
             <div key={index} className="group p-8 rounded-2xl transition-all duration-300 hover:shadow-2xl border border-purple-100 bg-gradient-to-br from-white to-purple-50 hover:scale-105">
