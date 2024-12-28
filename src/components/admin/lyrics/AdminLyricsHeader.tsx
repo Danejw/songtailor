@@ -14,7 +14,20 @@ export function AdminLyricsHeader({
 }: AdminLyricsHeaderProps) {
   return (
     <div className="flex justify-end gap-2 mb-4">
-      {/* Empty for now - we moved the generate button to TextEditor */}
+      <Button
+        variant="outline"
+        onClick={onGenerateLyrics}
+        disabled={isGenerating || !isEditing}
+      >
+        {isGenerating ? (
+          <>
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            Generating...
+          </>
+        ) : (
+          "Generate Lyrics"
+        )}
+      </Button>
     </div>
   );
 }
