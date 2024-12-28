@@ -20,19 +20,25 @@ export class FileUrlManager {
       const filename = this.extractFilename(filePath);
       console.log('Getting signed URL for:', { bucket, filename });
       
-      const { data, error } = await supabase.storage
+      // Create a new signed URL with a longer expiration time (24 hours)
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
         .from(bucket)
-        .createSignedUrl(filename, 3600);
+        .createSignedUrl(filename, 86400); // 24 hours in seconds
 
-      if (error) {
-        console.error('Error getting signed URL:', error);
-        throw error;
+      if (signedUrlError) {
+        console.error('Error getting signed URL:', signedUrlError);
+        throw signedUrlError;
       }
 
-      console.log('Got signed URL:', data?.signedUrl);
-      return data?.signedUrl || '';
+      if (!signedUrlData?.signedUrl) {
+        throw new Error('No signed URL returned');
+      }
+
+      console.log('Got signed URL successfully');
+      return signedUrlData.signedUrl;
     } catch (error) {
       console.error('Error in getPublicUrl:', error);
+      // Return an empty string instead of throwing to avoid cascading errors
       return '';
     }
   }
