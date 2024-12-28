@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Eye, Edit2, Loader2, ChevronUp, ChevronDown } from "lucide-react";
 
 interface TextEditorProps {
@@ -120,14 +121,16 @@ export function TextEditor({
         )}
       </CardHeader>
       <CardContent className="space-y-4">
-        <Textarea
-          ref={textareaRef}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="min-h-[300px] font-mono"
-          placeholder={placeholder}
-          readOnly={!isEditing}
-        />
+        <ScrollArea className="h-[calc(100vh-400px)] min-h-[300px] w-full rounded-md border">
+          <Textarea
+            ref={textareaRef}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="min-h-full border-none focus-visible:ring-0 resize-none"
+            placeholder={placeholder}
+            readOnly={!isEditing}
+          />
+        </ScrollArea>
         {isEditing && (
           <div className="space-y-4">
             {showQuickActions && (
