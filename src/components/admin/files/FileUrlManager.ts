@@ -2,7 +2,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 export class FileUrlManager {
   static extractFilename(url: string): string {
-    const parts = url.split('/');
+    // Remove any query parameters first
+    const urlWithoutParams = url.split('?')[0];
+    const parts = urlWithoutParams.split('/');
     return parts[parts.length - 1];
   }
 
@@ -10,6 +12,11 @@ export class FileUrlManager {
     if (!filePath) return '';
     
     try {
+      // If the filePath already contains a token, return it as is
+      if (filePath.includes('token=')) {
+        return filePath;
+      }
+      
       const filename = this.extractFilename(filePath);
       console.log('Getting signed URL for:', { bucket, filename });
       
