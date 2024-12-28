@@ -26,8 +26,9 @@ serve(async (req) => {
     );
 
     // Get request data
-    const { orderSongId, currentLyrics, additionalPrompt } = await req.json() as RequestBody;
-    console.log('Received request for orderSongId:', orderSongId);
+    const requestData = await req.json();
+    const { orderSongId, currentLyrics, additionalPrompt } = requestData as RequestBody;
+    console.log('Received request data:', { orderSongId, hasCurrentLyrics: !!currentLyrics, hasAdditionalPrompt: !!additionalPrompt });
 
     // Verify admin status
     const authHeader = req.headers.get('Authorization')?.split('Bearer ')[1];
@@ -107,6 +108,13 @@ serve(async (req) => {
       themes: order.songs.themes
     });
 
+    // Verify OpenAI API key
+    const openAIApiKey = Deno.env.get('OPEN_AI_API_KEY');
+    if (!openAIApiKey) {
+      console.error('OpenAI API key not found');
+      throw new Error('OpenAI API key not configured');
+    }
+
     // Prepare context for OpenAI
     const metadata = order.metadata as Record<string, any> || {};
     const songStyle = order.songs.style || '';
@@ -137,13 +145,13 @@ serve(async (req) => {
 3. Include at least one verse and one chorus
 4. Make it emotionally resonant and memorable\n`;
 
-    console.log('Sending request to OpenAI with prompt:', prompt);
+    console.log('Sending request to OpenAI with prompt length:', prompt.length);
 
     // Call OpenAI API
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPEN_AI_API_KEY')}`,
+        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
