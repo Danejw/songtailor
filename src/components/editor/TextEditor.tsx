@@ -13,6 +13,7 @@ interface TextEditorProps {
   className?: string;
   onSave?: (content: string) => Promise<void>;
   onModeChange?: (isEditing: boolean) => void;
+  onContentChange?: (content: string) => void;
 }
 
 const SECTION_MARKERS = [
@@ -32,6 +33,7 @@ export function TextEditor({
   className = "",
   onSave,
   onModeChange,
+  onContentChange,
 }: TextEditorProps) {
   const [content, setContent] = useState(initialContent);
   const [isEditing, setIsEditing] = useState(false);
@@ -43,6 +45,11 @@ export function TextEditor({
     const newMode = !isEditing;
     setIsEditing(newMode);
     onModeChange?.(newMode);
+  };
+
+  const handleContentChange = (newContent: string) => {
+    setContent(newContent);
+    onContentChange?.(newContent);
   };
 
   const handleSave = async () => {
@@ -65,20 +72,17 @@ export function TextEditor({
     const end = textarea.selectionEnd;
     const text = textarea.value;
     
-    // Add newlines before and after if we're not at the start of a line
     const beforeNewline = start > 0 && text[start - 1] !== '\n' ? '\n' : '';
     const afterNewline = end < text.length && text[end] !== '\n' ? '\n' : '';
     
     const sectionText = `${beforeNewline}[${section}]${afterNewline}`;
     const newContent = text.substring(0, start) + sectionText + text.substring(end);
     
-    setContent(newContent);
+    handleContentChange(newContent);
     
-    // Reset cursor position after the inserted section
-    const newPosition = start + sectionText.length;
     setTimeout(() => {
       textarea.focus();
-      textarea.setSelectionRange(newPosition, newPosition);
+      textarea.setSelectionRange(start + sectionText.length, start + sectionText.length);
     }, 0);
   };
 
@@ -125,7 +129,7 @@ export function TextEditor({
           <Textarea
             ref={textareaRef}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => handleContentChange(e.target.value)}
             className="min-h-[300px] w-full border-none focus-visible:ring-0 resize-none"
             placeholder={placeholder}
             readOnly={!isEditing}

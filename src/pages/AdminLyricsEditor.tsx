@@ -18,6 +18,7 @@ export default function AdminLyricsEditor() {
   const [selectedOrderSongId, setSelectedOrderSongId] = useState<string | null>(null);
   const [lyrics, setLyrics] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [isEditing, setIsEditing] = useState(false);
   const { isGenerating, generateLyrics } = useLyricsGeneration();
 
   useEffect(() => {
@@ -143,7 +144,7 @@ export default function AdminLyricsEditor() {
   };
 
   const handleGenerateLyrics = async () => {
-    if (!selectedOrderSongId) return;
+    if (!selectedOrderSongId || !isEditing) return;
     
     const generatedLyrics = await generateLyrics(selectedOrderSongId, lyrics);
     if (generatedLyrics) {
@@ -219,6 +220,7 @@ export default function AdminLyricsEditor() {
           <AdminLyricsHeader
             isGenerating={isGenerating}
             onGenerateLyrics={handleGenerateLyrics}
+            isEditing={isEditing}
           />
           <TextEditor
             title="Song Lyrics"
@@ -226,6 +228,8 @@ export default function AdminLyricsEditor() {
             isEditable={true}
             placeholder="No lyrics available"
             onSave={handleSave}
+            onModeChange={setIsEditing}
+            onContentChange={setLyrics}
           />
         </>
       )}
