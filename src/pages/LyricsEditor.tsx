@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { OrderSelector } from "@/components/lyrics/OrderSelector";
 import { TextEditor } from "@/components/editor/TextEditor";
 import type { Order } from "@/components/admin/types";
+import { convertToOrderMetadata } from "@/components/admin/types";
 
 export default function LyricsEditor() {
   const navigate = useNavigate();

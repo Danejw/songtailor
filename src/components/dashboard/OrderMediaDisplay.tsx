@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { FileUrlManager } from "@/components/admin/files/FileUrlManager";
 import { useToast } from "@/hooks/use-toast";
 import { useAudio } from "@/components/audio/AudioContext";
-import type { OrderSong } from "@/components/admin/types";
+import type { OrderSong, OrderMetadata } from "@/components/admin/types";
 import { supabase } from "@/integrations/supabase/client";
 import { Play, Pause, Download, Image } from "lucide-react";
 import { hasFormData } from "@/components/admin/types";
@@ -33,7 +33,6 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
           setImageUrl(url);
         }
 
-        // Only fetch order data if we have an order_id
         if (orderSong.order_id) {
           const { data: orderData, error: orderError } = await supabase
             .from('orders')
@@ -43,9 +42,11 @@ export function OrderMediaDisplay({ orderSong }: OrderMediaDisplayProps) {
 
           if (orderError) throw orderError;
 
-          // Safely extract song title from metadata using type guard
-          if (orderData?.metadata && hasFormData(orderData.metadata)) {
-            setSongTitle(orderData.metadata.formData.songTitle || "Untitled Song");
+          if (orderData?.metadata) {
+            const metadata = orderData.metadata as OrderMetadata;
+            if (hasFormData(metadata) && metadata.formData?.songTitle) {
+              setSongTitle(metadata.formData.songTitle);
+            }
           }
         }
 

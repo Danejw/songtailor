@@ -51,21 +51,23 @@ export interface OrderFormData {
   songTitle?: string;
 }
 
-export const convertToOrderMetadata = (metadata: any): OrderMetadata => {
+type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
+
+export const convertToOrderMetadata = (metadata: Json | null): OrderMetadata => {
   if (!metadata) return {};
   
   try {
     if (typeof metadata === 'string') {
       return JSON.parse(metadata);
     }
-    return metadata;
+    return metadata as OrderMetadata;
   } catch (error) {
     console.error('Error parsing metadata:', error);
     return {};
   }
 };
 
-export const hasFormData = (metadata: any): boolean => {
+export const hasFormData = (metadata: OrderMetadata | null): boolean => {
   if (!metadata) return false;
   return !!metadata.formData;
 };
