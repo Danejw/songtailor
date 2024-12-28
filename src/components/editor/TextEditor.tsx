@@ -121,16 +121,17 @@ export function TextEditor({
         )}
       </CardHeader>
       <CardContent className="space-y-4">
-        <ScrollArea className="relative h-[60vh] w-full rounded-md border">
+        <div className="w-full rounded-md border">
           <Textarea
             ref={textareaRef}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="absolute inset-0 min-h-full w-full border-none focus-visible:ring-0 resize-none"
+            className="min-h-[300px] w-full border-none focus-visible:ring-0 resize-none"
             placeholder={placeholder}
             readOnly={!isEditing}
+            style={{ height: textareaRef.current?.scrollHeight }}
           />
-        </ScrollArea>
+        </div>
         {isEditing && (
           <div className="space-y-4">
             {showQuickActions && (
