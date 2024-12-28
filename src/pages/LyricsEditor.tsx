@@ -1,24 +1,20 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Eye, Edit2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { OrderSelector } from "@/components/lyrics/OrderSelector";
-import { LyricsTextArea } from "@/components/lyrics/LyricsTextArea";
+import { TextEditor } from "@/components/editor/TextEditor";
 import type { Order } from "@/components/admin/types";
 
 export default function LyricsEditor() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [lyrics, setLyrics] = useState("");
   const [canEdit, setCanEdit] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrderSongId, setSelectedOrderSongId] = useState<string | null>(null);
+  const [lyrics, setLyrics] = useState("");
 
   useEffect(() => {
     checkAuth();
@@ -39,7 +35,6 @@ export default function LyricsEditor() {
         description: "Please sign in to view lyrics",
       });
       navigate("/login");
-      return;
     }
   };
 
@@ -107,10 +102,8 @@ export default function LyricsEditor() {
         return;
       }
 
-      // Check if user is owner
       const isOwner = orderSong.orders?.user_id === session.user.id;
       
-      // Check if user is admin
       const { data: profile } = await supabase
         .from('profiles')
         .select('is_admin')
@@ -133,14 +126,13 @@ export default function LyricsEditor() {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (newLyrics: string) => {
     if (!selectedOrderSongId) return;
 
     try {
-      setIsSaving(true);
       const { error } = await supabase
         .from('order_songs')
-        .update({ lyrics })
+        .update({ lyrics: newLyrics })
         .eq('id', selectedOrderSongId);
 
       if (error) throw error;
@@ -149,7 +141,7 @@ export default function LyricsEditor() {
         title: "Success",
         description: "Lyrics saved successfully",
       });
-      setIsEditing(false);
+      setLyrics(newLyrics);
     } catch (error) {
       console.error('Error saving lyrics:', error);
       toast({
@@ -157,8 +149,7 @@ export default function LyricsEditor() {
         description: "Failed to save lyrics",
         variant: "destructive",
       });
-    } finally {
-      setIsSaving(false);
+      throw error; // Re-throw to let TextEditor handle the error state
     }
   };
 
@@ -171,50 +162,22 @@ export default function LyricsEditor() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle>Song Lyrics</CardTitle>
-          <div className="flex gap-2">
-            {selectedOrderSongId && canEdit && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsEditing(!isEditing)}
-              >
-                {isEditing ? (
-                  <>
-                    <Eye className="h-4 w-4 mr-2" />
-                    View Mode
-                  </>
-                ) : (
-                  <>
-                    <Edit2 className="h-4 w-4 mr-2" />
-                    Edit Mode
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <OrderSelector
-            orders={orders}
-            selectedOrderSongId={selectedOrderSongId}
-            onOrderSelect={setSelectedOrderSongId}
-          />
+    <div className="container mx-auto px-4 py-8 space-y-4">
+      <OrderSelector
+        orders={orders}
+        selectedOrderSongId={selectedOrderSongId}
+        onOrderSelect={setSelectedOrderSongId}
+      />
 
-          {selectedOrderSongId && (
-            <LyricsTextArea
-              lyrics={lyrics}
-              isEditing={isEditing}
-              isSaving={isSaving}
-              onLyricsChange={setLyrics}
-              onSave={handleSave}
-            />
-          )}
-        </CardContent>
-      </Card>
+      {selectedOrderSongId && (
+        <TextEditor
+          title="Song Lyrics"
+          initialContent={lyrics}
+          isEditable={canEdit}
+          placeholder="No lyrics available"
+          onSave={handleSave}
+        />
+      )}
     </div>
   );
 }
