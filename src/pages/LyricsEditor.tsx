@@ -2,28 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Eye, Edit2 } from "lucide-react";
-
-interface Order {
-  id: string;
-  songs: {
-    title: string;
-  } | null;
-  order_songs: {
-    id: string;
-    lyrics: string | null;
-  }[] | null;
-}
+import { OrderSelector } from "@/components/lyrics/OrderSelector";
+import { LyricsTextArea } from "@/components/lyrics/LyricsTextArea";
+import type { Order } from "@/components/admin/types";
 
 export default function LyricsEditor() {
   const navigate = useNavigate();
@@ -69,7 +53,7 @@ export default function LyricsEditor() {
         .from('orders')
         .select(`
           id,
-          songs (
+          songs!fk_song (
             title
           ),
           order_songs (
@@ -101,7 +85,6 @@ export default function LyricsEditor() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      // Fetch order song with related order and check permissions
       const { data: orderSong, error } = await supabase
         .from('order_songs')
         .select(`
@@ -111,7 +94,7 @@ export default function LyricsEditor() {
           )
         `)
         .eq('id', orderSongId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -215,50 +198,20 @@ export default function LyricsEditor() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Select
-            onValueChange={(value) => setSelectedOrderSongId(value)}
-            value={selectedOrderSongId || undefined}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a song to view/edit lyrics" />
-            </SelectTrigger>
-            <SelectContent>
-              {orders.map((order) => (
-                order.order_songs?.map((orderSong) => (
-                  <SelectItem key={orderSong.id} value={orderSong.id}>
-                    {order.songs?.title || "Untitled Song"}
-                  </SelectItem>
-                ))
-              ))}
-            </SelectContent>
-          </Select>
+          <OrderSelector
+            orders={orders}
+            selectedOrderSongId={selectedOrderSongId}
+            onOrderSelect={setSelectedOrderSongId}
+          />
 
           {selectedOrderSongId && (
-            <>
-              <Textarea
-                value={lyrics}
-                onChange={(e) => setLyrics(e.target.value)}
-                className="min-h-[300px] font-mono"
-                placeholder="No lyrics available"
-                readOnly={!isEditing}
-              />
-              {isEditing && (
-                <Button
-                  className="w-full"
-                  onClick={handleSave}
-                  disabled={isSaving}
-                >
-                  {isSaving ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    "Save Changes"
-                  )}
-                </Button>
-              )}
-            </>
+            <LyricsTextArea
+              lyrics={lyrics}
+              isEditing={isEditing}
+              isSaving={isSaving}
+              onLyricsChange={setLyrics}
+              onSave={handleSave}
+            />
           )}
         </CardContent>
       </Card>
