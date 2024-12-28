@@ -5,6 +5,7 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Music, Loader2 } from "lucide-react";
 import type { OrderSong } from "@/components/admin/types";
+import { hasFormData } from "@/components/admin/types";
 
 const PublicSongs = () => {
   const { data: publicSongs, isLoading, error } = useQuery({
@@ -50,26 +51,44 @@ const PublicSongs = () => {
 
   const getSongTitle = (song: any) => {
     const songData = song.orders?.songs;
-    const orderMetadata = song.orders?.metadata?.formData;
+    const metadata = song.orders?.metadata;
     
     if (songData?.title) return songData.title;
-    if (orderMetadata?.songTitle) return orderMetadata.songTitle;
+    if (metadata && hasFormData(metadata) && metadata.formData.songTitle) {
+      return metadata.formData.songTitle;
+    }
     
     if (song.song_url) {
       const fileName = song.song_url.split('/').pop()?.split('.')[0] || "Untitled Song";
       return fileName
         .replace(/[_-]/g, ' ')
-        .replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+        .replace(/\w\S*/g, (txt: string) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
     }
     return "Untitled Song";
   };
 
   const getSongDetails = (song: any) => {
     const songData = song.orders?.songs;
-    const orderMetadata = song.orders?.metadata?.formData;
+    const metadata = song.orders?.metadata;
     
-    const style = songData?.style || orderMetadata?.musicStyle || "Unknown Style";
-    const theme = songData?.themes || orderMetadata?.theme || "Various Themes";
+    let style = "Unknown Style";
+    let theme = "Various Themes";
+
+    if (songData?.style) {
+      style = songData.style;
+    } else if (metadata && hasFormData(metadata) && metadata.formData.musicStyle) {
+      style = metadata.formData.musicStyle;
+      if (metadata.formData.otherMusicStyle && style === "Other") {
+        style = metadata.formData.otherMusicStyle;
+      }
+    }
+
+    if (songData?.themes) {
+      theme = songData.themes;
+    } else if (metadata && hasFormData(metadata) && metadata.formData.theme) {
+      theme = metadata.formData.theme;
+    }
+
     return { style, theme };
   };
 
