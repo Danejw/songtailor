@@ -79,7 +79,6 @@ export default function LyricsEditor() {
 
       if (error) throw error;
 
-      // Convert the raw data to match our Order type
       const typedOrders: Order[] = (ordersData || []).map(order => ({
         ...order,
         metadata: order.metadata ? convertToOrderMetadata(order.metadata) : undefined
@@ -109,7 +108,8 @@ export default function LyricsEditor() {
         .select(`
           *,
           orders!order_songs_order_id_fkey (
-            user_id
+            user_id,
+            song_id
           )
         `)
         .eq('id', orderSongId)
@@ -154,12 +154,32 @@ export default function LyricsEditor() {
     if (!selectedOrderSongId) return;
 
     try {
-      const { error } = await supabase
+      // First, get the order_song to find the associated song_id
+      const { data: orderSong, error: orderSongError } = await supabase
         .from('order_songs')
-        .update({ lyrics: newLyrics })
-        .eq('id', selectedOrderSongId);
+        .select('orders!order_songs_order_id_fkey (song_id)')
+        .eq('id', selectedOrderSongId)
+        .single();
 
-      if (error) throw error;
+      if (orderSongError) throw orderSongError;
+
+      const songId = orderSong.orders.song_id;
+
+      // Update both tables in parallel
+      const [orderSongUpdate, songUpdate] = await Promise.all([
+        supabase
+          .from('order_songs')
+          .update({ lyrics: newLyrics })
+          .eq('id', selectedOrderSongId),
+        
+        supabase
+          .from('songs')
+          .update({ lyrics: newLyrics })
+          .eq('id', songId)
+      ]);
+
+      if (orderSongUpdate.error) throw orderSongUpdate.error;
+      if (songUpdate.error) throw songUpdate.error;
 
       toast({
         title: "Success",
@@ -173,7 +193,7 @@ export default function LyricsEditor() {
         description: "Failed to save lyrics",
         variant: "destructive",
       });
-      throw error; // Re-throw to let TextEditor handle the error state
+      throw error;
     }
   };
 
