@@ -19,10 +19,10 @@ const PublicSongs = () => {
           is_primary,
           is_public,
           created_at,
-          orders!inner (
+          orders (
             id,
             metadata,
-            songs!inner (
+            songs!fk_song (
               id,
               title,
               style,
@@ -49,12 +49,18 @@ const PublicSongs = () => {
   });
 
   const getSongTitle = (song: any) => {
-    const songData = song.orders?.songs;
     const orderMetadata = song.orders?.metadata?.formData;
+    const songData = song.orders?.songs;
     
     if (songData?.title) return songData.title;
     if (orderMetadata?.songTitle) return orderMetadata.songTitle;
     
+    if (song.song_url) {
+      const fileName = song.song_url.split('/').pop()?.split('.')[0] || "Untitled Song";
+      return fileName
+        .replace(/[_-]/g, ' ')
+        .replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+    }
     return "Untitled Song";
   };
 
@@ -62,7 +68,7 @@ const PublicSongs = () => {
     const songData = song.orders?.songs;
     const orderMetadata = song.orders?.metadata?.formData;
     
-    const style = songData?.style || orderMetadata?.musicStyle || "Various Styles";
+    const style = songData?.style || orderMetadata?.musicStyle || "Unknown Style";
     const theme = songData?.themes || orderMetadata?.theme || "Various Themes";
     return { style, theme };
   };
