@@ -9,7 +9,7 @@ const corsHeaders = {
 
 interface RequestBody {
   orderSongId: string;
-  customPrompt?: string;
+  currentLyrics?: string;
 }
 
 serve(async (req) => {
@@ -25,16 +25,19 @@ serve(async (req) => {
     );
 
     // Get request data
-    const { orderSongId, customPrompt } = await req.json() as RequestBody;
+    const { orderSongId, currentLyrics } = await req.json() as RequestBody;
+    console.log('Received request for orderSongId:', orderSongId);
 
     // Verify admin status
     const authHeader = req.headers.get('Authorization')?.split('Bearer ')[1];
     if (!authHeader) {
+      console.error('No authorization header provided');
       throw new Error('No authorization header');
     }
 
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser(authHeader);
     if (authError || !user) {
+      console.error('Auth error:', authError);
       throw new Error('Unauthorized');
     }
 
@@ -45,11 +48,18 @@ serve(async (req) => {
       .eq('id', user.id)
       .single();
 
-    if (profileError || !profile?.is_admin) {
+    if (profileError) {
+      console.error('Error fetching profile:', profileError);
+      throw new Error('Failed to verify admin status');
+    }
+
+    if (!profile?.is_admin) {
+      console.error('User is not an admin:', user.id);
       throw new Error('Admin access required');
     }
 
     // Fetch order song data
+    console.log('Fetching order song data...');
     const { data: orderSong, error: orderSongError } = await supabaseClient
       .from('order_songs')
       .select(`
@@ -65,15 +75,27 @@ serve(async (req) => {
       .eq('id', orderSongId)
       .single();
 
-    if (orderSongError || !orderSong) {
+    if (orderSongError) {
+      console.error('Error fetching order song:', orderSongError);
+      throw new Error(`Order song fetch error: ${orderSongError.message}`);
+    }
+
+    if (!orderSong) {
+      console.error('Order song not found for ID:', orderSongId);
       throw new Error('Order song not found');
     }
+
+    console.log('Successfully fetched order song data:', {
+      id: orderSong.id,
+      style: orderSong.orders?.songs?.style,
+      themes: orderSong.orders?.songs?.themes
+    });
 
     // Prepare context for OpenAI
     const metadata = orderSong.orders?.metadata as Record<string, any> || {};
     const songStyle = orderSong.orders?.songs?.style || '';
     const themes = orderSong.orders?.songs?.themes || '';
-    const existingLyrics = orderSong.lyrics || '';
+    const existingLyrics = currentLyrics || orderSong.lyrics || '';
 
     // Construct the prompt for OpenAI
     let prompt = `You are a professional songwriter. Create engaging and creative lyrics `;
@@ -93,10 +115,6 @@ serve(async (req) => {
 2. Ensure the lyrics flow naturally and match the specified style
 3. Include at least one verse and one chorus
 4. Make it emotionally resonant and memorable\n`;
-
-    if (customPrompt) {
-      prompt += `\nAdditional Instructions: ${customPrompt}`;
-    }
 
     console.log('Sending request to OpenAI with prompt:', prompt);
 
@@ -141,8 +159,14 @@ serve(async (req) => {
         .eq('id', orderSong.orders.songs.id)
     ]);
 
-    if (orderSongUpdate.error) throw orderSongUpdate.error;
-    if (songUpdate.error) throw songUpdate.error;
+    if (orderSongUpdate.error) {
+      console.error('Error updating order_songs:', orderSongUpdate.error);
+      throw orderSongUpdate.error;
+    }
+    if (songUpdate.error) {
+      console.error('Error updating songs:', songUpdate.error);
+      throw songUpdate.error;
+    }
 
     console.log('Successfully updated database with new lyrics');
 
