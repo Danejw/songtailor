@@ -22,7 +22,7 @@ const PublicSongs = () => {
           orders (
             id,
             metadata,
-            songs (
+            songs!fk_song (
               id,
               title,
               style,
