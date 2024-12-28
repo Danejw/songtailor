@@ -43,10 +43,12 @@ export interface OrderSong {
 }
 
 export interface OrderMetadata {
-  formData?: {
-    [key: string]: any;
-  };
-  // Add other metadata fields as needed
+  formData?: OrderFormData;
+}
+
+export interface OrderFormData {
+  [key: string]: any;
+  songTitle?: string;
 }
 
 export const convertToOrderMetadata = (metadata: any): OrderMetadata => {

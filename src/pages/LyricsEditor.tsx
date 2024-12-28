@@ -44,12 +44,29 @@ export default function LyricsEditor() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      const { data: orders, error } = await supabase
+      const { data: ordersData, error } = await supabase
         .from('orders')
         .select(`
           id,
+          created_at,
+          status,
+          amount,
+          delivery_status,
+          includes_both_versions,
+          includes_cover_image,
+          payment_status,
+          payment_intent_id,
+          metadata,
+          user_id,
+          song_id,
           songs!fk_song (
-            title
+            id,
+            title,
+            style,
+            lyrics,
+            reference_links,
+            themes,
+            status
           ),
           order_songs (
             id,
@@ -61,7 +78,7 @@ export default function LyricsEditor() {
 
       if (error) throw error;
 
-      setOrders(orders || []);
+      setOrders(ordersData || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast({
