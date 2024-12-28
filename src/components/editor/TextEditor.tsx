@@ -2,9 +2,10 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Eye, Edit2, Loader2, ChevronUp, ChevronDown, Copy, Check } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { ChevronUp, ChevronDown } from "lucide-react";
+import { TextEditorCopyButton } from "./TextEditorCopyButton";
+import { TextEditorGenerateButton } from "./TextEditorGenerateButton";
+import { TextEditorModeButton } from "./TextEditorModeButton";
 
 interface TextEditorProps {
   title?: string;
@@ -15,6 +16,8 @@ interface TextEditorProps {
   onSave?: (content: string) => Promise<void>;
   onModeChange?: (isEditing: boolean) => void;
   onContentChange?: (content: string) => void;
+  isGenerating?: boolean;
+  onGenerateLyrics?: () => void;
 }
 
 const SECTION_MARKERS = [
@@ -35,13 +38,13 @@ export function TextEditor({
   onSave,
   onModeChange,
   onContentChange,
+  isGenerating = false,
+  onGenerateLyrics,
 }: TextEditorProps) {
-  const { toast } = useToast();
   const [content, setContent] = useState(initialContent);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(true);
-  const [hasCopied, setHasCopied] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleModeToggle = () => {
@@ -64,24 +67,6 @@ export function TextEditor({
       setIsEditing(false);
     } finally {
       setIsSaving(false);
-    }
-  };
-
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(content);
-      setHasCopied(true);
-      toast({
-        title: "Copied!",
-        description: "Lyrics copied to clipboard",
-      });
-      setTimeout(() => setHasCopied(false), 2000);
-    } catch (err) {
-      toast({
-        title: "Failed to copy",
-        description: "Please try again",
-        variant: "destructive",
-      });
     }
   };
 
@@ -112,23 +97,14 @@ export function TextEditor({
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <CardTitle>{title}</CardTitle>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={copyToClipboard}
-          >
-            {hasCopied ? (
-              <>
-                <Check className="h-4 w-4 mr-2" />
-                Copied
-              </>
-            ) : (
-              <>
-                <Copy className="h-4 w-4 mr-2" />
-                Copy
-              </>
-            )}
-          </Button>
+          {onGenerateLyrics && (
+            <TextEditorGenerateButton
+              isGenerating={isGenerating}
+              onGenerateLyrics={onGenerateLyrics}
+              disabled={!isEditing}
+            />
+          )}
+          <TextEditorCopyButton content={content} />
           {isEditable && (
             <>
               <Button
@@ -142,24 +118,11 @@ export function TextEditor({
                   <ChevronDown className="h-4 w-4" />
                 )}
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleModeToggle}
-                disabled={isSaving}
-              >
-                {isEditing ? (
-                  <>
-                    <Eye className="h-4 w-4 mr-2" />
-                    View Mode
-                  </>
-                ) : (
-                  <>
-                    <Edit2 className="h-4 w-4 mr-2" />
-                    Edit Mode
-                  </>
-                )}
-              </Button>
+              <TextEditorModeButton
+                isEditing={isEditing}
+                isSaving={isSaving}
+                onModeToggle={handleModeToggle}
+              />
             </>
           )}
         </div>
@@ -198,14 +161,7 @@ export function TextEditor({
                 onClick={handleSave}
                 disabled={isSaving}
               >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  "Save Changes"
-                )}
+                {isSaving ? "Saving..." : "Save Changes"}
               </Button>
             )}
           </div>
