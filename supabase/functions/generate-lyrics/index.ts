@@ -140,10 +140,12 @@ serve(async (req) => {
     }
 
     prompt += `\nRequirements:
-1. Structure the lyrics with clear section markers: [Intro], [Verse], [Chorus], [Bridge], [Instrumental], [Outro]
-2. Ensure the lyrics flow naturally and match the specified style
-3. Include at least one verse and one chorus
-4. Make it emotionally resonant and memorable\n`;
+1. ALWAYS start with an [Instrumental] section to set the mood
+2. Structure the lyrics with clear section markers: [Verse], [Chorus], [Bridge]
+3. Ensure the lyrics flow naturally and match the specified style
+4. Include at least one verse and one chorus
+5. Make it emotionally resonant and memorable
+6. ALWAYS end with an [Instrumental] section to close the song\n`;
 
     console.log('Sending request to OpenAI with prompt length:', prompt.length);
 
@@ -157,7 +159,10 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4',
         messages: [
-          { role: 'system', content: 'You are a professional songwriter with expertise in various musical styles.' },
+          { 
+            role: 'system', 
+            content: 'You are a professional songwriter with expertise in various musical styles. Always structure songs to begin and end with instrumental sections to create a complete musical experience.' 
+          },
           { role: 'user', content: prompt }
         ],
         temperature: 0.7,
